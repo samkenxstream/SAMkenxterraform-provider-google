@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Datastore"
-page_title: "Google: google_datastore_index"
 description: |-
   Describes a composite index for Cloud Datastore.
 ---
@@ -74,7 +73,7 @@ The following arguments are supported:
   (Optional)
   Policy for including ancestors in the index.
   Default value is `NONE`.
-  Possible values are `NONE` and `ALL_ANCESTORS`.
+  Possible values are: `NONE`, `ALL_ANCESTORS`.
 
 * `properties` -
   (Optional)
@@ -94,7 +93,7 @@ The following arguments are supported:
 * `direction` -
   (Required)
   The direction the index should optimize for sorting.
-  Possible values are `ASCENDING` and `DESCENDING`.
+  Possible values are: `ASCENDING`, `DESCENDING`.
 
 ## Attributes Reference
 
@@ -109,7 +108,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Network services"
-page_title: "Google: google_network_services_edge_cache_origin"
 description: |-
   EdgeCacheOrigin represents a HTTP-reachable backend for an EdgeCacheService.
 ---
@@ -175,7 +174,7 @@ The following arguments are supported:
   (Optional)
   The protocol to use to connect to the configured origin. Defaults to HTTP2, and it is strongly recommended that users use HTTP2 for both security & performance.
   When using HTTP2 or HTTPS as the protocol, a valid, publicly-signed, unexpired TLS (SSL) certificate must be presented by the origin server.
-  Possible values are `HTTP2`, `HTTPS`, and `HTTP`.
+  Possible values are: `HTTP2`, `HTTPS`, `HTTP`.
 
 * `port` -
   (Optional)
@@ -215,7 +214,7 @@ The following arguments are supported:
   - RETRIABLE_4XX: Retry for retriable 4xx response codes, which include HTTP 409 (Conflict) and HTTP 429 (Too Many Requests)
   - NOT_FOUND: Retry if the origin returns a HTTP 404 (Not Found). This can be useful when generating video content, and the segment is not available yet.
   - FORBIDDEN: Retry if the origin returns a HTTP 403 (Forbidden).
-  Each value may be one of `CONNECT_FAILURE`, `HTTP_5XX`, `GATEWAY_ERROR`, `RETRIABLE_4XX`, `NOT_FOUND`, and `FORBIDDEN`.
+  Each value may be one of: `CONNECT_FAILURE`, `HTTP_5XX`, `GATEWAY_ERROR`, `RETRIABLE_4XX`, `NOT_FOUND`, `FORBIDDEN`.
 
 * `timeout` -
   (Optional)
@@ -315,7 +314,7 @@ The following arguments are supported:
 * `request_headers_to_add` -
   (Optional)
   Describes a header to add.
-  You may add a maximum of 5 request headers.
+  You may add a maximum of 25 request headers.
   Structure is [documented below](#nested_request_headers_to_add).
 
 
@@ -357,7 +356,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 60 minutes.
 - `update` - Default is 60 minutes.

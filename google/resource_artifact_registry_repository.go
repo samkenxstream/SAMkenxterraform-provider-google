@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceArtifactRegistryRepository() *schema.Resource {
+func ResourceArtifactRegistryRepository() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceArtifactRegistryRepositoryCreate,
 		Read:   resourceArtifactRegistryRepositoryRead,
@@ -63,6 +63,21 @@ You can only create alpha formats if you are a member of the
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: `The user-provided description of the repository.`,
+			},
+			"docker_config": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: `Docker repository config contains repository level configuration for the repositories of docker type.`,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"immutable_tags": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: `The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.`,
+						},
+					},
+				},
 			},
 			"kms_key_name": {
 				Type:     schema.TypeString,
@@ -117,6 +132,153 @@ snapshot versions.`,
 					},
 				},
 			},
+			"mode": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateEnum([]string{"STANDARD_REPOSITORY", "VIRTUAL_REPOSITORY", "REMOTE_REPOSITORY", ""}),
+				Description:  `The mode configures the repository to serve artifacts from different sources. Default value: "STANDARD_REPOSITORY" Possible values: ["STANDARD_REPOSITORY", "VIRTUAL_REPOSITORY", "REMOTE_REPOSITORY"]`,
+				Default:      "STANDARD_REPOSITORY",
+			},
+			"remote_repository_config": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				ForceNew:    true,
+				Description: `Configuration specific for a Remote Repository.`,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"description": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							ForceNew:    true,
+							Description: `The description of the remote source.`,
+						},
+						"docker_repository": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							ForceNew:    true,
+							Description: `Specific settings for a Docker remote repository.`,
+							MaxItems:    1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"public_repository": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validateEnum([]string{"DOCKER_HUB", ""}),
+										Description:  `Address of the remote repository. Default value: "DOCKER_HUB" Possible values: ["DOCKER_HUB"]`,
+										Default:      "DOCKER_HUB",
+										ExactlyOneOf: []string{"remote_repository_config.0.docker_repository.0.public_repository"},
+									},
+								},
+							},
+							ExactlyOneOf: []string{"remote_repository_config.0.docker_repository", "remote_repository_config.0.maven_repository", "remote_repository_config.0.npm_repository", "remote_repository_config.0.python_repository"},
+						},
+						"maven_repository": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							ForceNew:    true,
+							Description: `Specific settings for a Maven remote repository.`,
+							MaxItems:    1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"public_repository": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validateEnum([]string{"MAVEN_CENTRAL", ""}),
+										Description:  `Address of the remote repository. Default value: "MAVEN_CENTRAL" Possible values: ["MAVEN_CENTRAL"]`,
+										Default:      "MAVEN_CENTRAL",
+										ExactlyOneOf: []string{"remote_repository_config.0.maven_repository.0.public_repository"},
+									},
+								},
+							},
+							ExactlyOneOf: []string{"remote_repository_config.0.docker_repository", "remote_repository_config.0.maven_repository", "remote_repository_config.0.npm_repository", "remote_repository_config.0.python_repository"},
+						},
+						"npm_repository": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							ForceNew:    true,
+							Description: `Specific settings for an Npm remote repository.`,
+							MaxItems:    1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"public_repository": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validateEnum([]string{"NPMJS", ""}),
+										Description:  `Address of the remote repository. Default value: "NPMJS" Possible values: ["NPMJS"]`,
+										Default:      "NPMJS",
+										ExactlyOneOf: []string{"remote_repository_config.0.npm_repository.0.public_repository"},
+									},
+								},
+							},
+							ExactlyOneOf: []string{"remote_repository_config.0.docker_repository", "remote_repository_config.0.maven_repository", "remote_repository_config.0.npm_repository", "remote_repository_config.0.python_repository"},
+						},
+						"python_repository": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							ForceNew:    true,
+							Description: `Specific settings for a Python remote repository.`,
+							MaxItems:    1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"public_repository": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validateEnum([]string{"PYPI", ""}),
+										Description:  `Address of the remote repository. Default value: "PYPI" Possible values: ["PYPI"]`,
+										Default:      "PYPI",
+										ExactlyOneOf: []string{"remote_repository_config.0.python_repository.0.public_repository"},
+									},
+								},
+							},
+							ExactlyOneOf: []string{"remote_repository_config.0.docker_repository", "remote_repository_config.0.maven_repository", "remote_repository_config.0.npm_repository", "remote_repository_config.0.python_repository"},
+						},
+					},
+				},
+				ConflictsWith: []string{"virtual_repository_config"},
+			},
+			"virtual_repository_config": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: `Configuration specific for a Virtual Repository.`,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"upstream_policies": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Description: `Policies that configure the upstream artifacts distributed by the Virtual
+Repository. Upstream policies cannot be set on a standard repository.`,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"id": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: `The user-provided ID of the upstream policy.`,
+									},
+									"priority": {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Description: `Entries with a greater priority value take precedence in the pull order.`,
+									},
+									"repository": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Description: `A reference to the repository resource, for example:
+"projects/p1/locations/us-central1/repository/repo1".`,
+									},
+								},
+							},
+						},
+					},
+				},
+				ConflictsWith: []string{"remote_repository_config"},
+			},
 			"create_time": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -126,7 +288,7 @@ snapshot versions.`,
 				Type:     schema.TypeString,
 				Computed: true,
 				Description: `The name of the repository, for example:
-"projects/p1/locations/us-central1/repositories/repo1"`,
+"repo1"`,
 			},
 			"update_time": {
 				Type:        schema.TypeString,
@@ -146,7 +308,7 @@ snapshot versions.`,
 
 func resourceArtifactRegistryRepositoryCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -176,11 +338,35 @@ func resourceArtifactRegistryRepositoryCreate(d *schema.ResourceData, meta inter
 	} else if v, ok := d.GetOkExists("kms_key_name"); !isEmptyValue(reflect.ValueOf(kmsKeyNameProp)) && (ok || !reflect.DeepEqual(v, kmsKeyNameProp)) {
 		obj["kmsKeyName"] = kmsKeyNameProp
 	}
+	dockerConfigProp, err := expandArtifactRegistryRepositoryDockerConfig(d.Get("docker_config"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("docker_config"); !isEmptyValue(reflect.ValueOf(dockerConfigProp)) && (ok || !reflect.DeepEqual(v, dockerConfigProp)) {
+		obj["dockerConfig"] = dockerConfigProp
+	}
 	mavenConfigProp, err := expandArtifactRegistryRepositoryMavenConfig(d.Get("maven_config"), d, config)
 	if err != nil {
 		return err
 	} else if v, ok := d.GetOkExists("maven_config"); !isEmptyValue(reflect.ValueOf(mavenConfigProp)) && (ok || !reflect.DeepEqual(v, mavenConfigProp)) {
 		obj["mavenConfig"] = mavenConfigProp
+	}
+	modeProp, err := expandArtifactRegistryRepositoryMode(d.Get("mode"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("mode"); !isEmptyValue(reflect.ValueOf(modeProp)) && (ok || !reflect.DeepEqual(v, modeProp)) {
+		obj["mode"] = modeProp
+	}
+	virtualRepositoryConfigProp, err := expandArtifactRegistryRepositoryVirtualRepositoryConfig(d.Get("virtual_repository_config"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("virtual_repository_config"); !isEmptyValue(reflect.ValueOf(virtualRepositoryConfigProp)) && (ok || !reflect.DeepEqual(v, virtualRepositoryConfigProp)) {
+		obj["virtualRepositoryConfig"] = virtualRepositoryConfigProp
+	}
+	remoteRepositoryConfigProp, err := expandArtifactRegistryRepositoryRemoteRepositoryConfig(d.Get("remote_repository_config"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("remote_repository_config"); !isEmptyValue(reflect.ValueOf(remoteRepositoryConfigProp)) && (ok || !reflect.DeepEqual(v, remoteRepositoryConfigProp)) {
+		obj["remoteRepositoryConfig"] = remoteRepositoryConfigProp
 	}
 
 	url, err := replaceVars(d, config, "{{ArtifactRegistryBasePath}}projects/{{project}}/locations/{{location}}/repositories?repository_id={{repository_id}}")
@@ -202,7 +388,7 @@ func resourceArtifactRegistryRepositoryCreate(d *schema.ResourceData, meta inter
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
+	res, err := SendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
 	if err != nil {
 		return fmt.Errorf("Error creating Repository: %s", err)
 	}
@@ -217,7 +403,7 @@ func resourceArtifactRegistryRepositoryCreate(d *schema.ResourceData, meta inter
 	// Use the resource in the operation response to populate
 	// identity fields and d.Id() before read
 	var opRes map[string]interface{}
-	err = artifactRegistryOperationWaitTimeWithResponse(
+	err = ArtifactRegistryOperationWaitTimeWithResponse(
 		config, res, &opRes, project, "Creating Repository", userAgent,
 		d.Timeout(schema.TimeoutCreate))
 	if err != nil {
@@ -245,7 +431,7 @@ func resourceArtifactRegistryRepositoryCreate(d *schema.ResourceData, meta inter
 
 func resourceArtifactRegistryRepositoryRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -268,7 +454,7 @@ func resourceArtifactRegistryRepositoryRead(d *schema.ResourceData, meta interfa
 		billingProject = bp
 	}
 
-	res, err := sendRequest(config, "GET", billingProject, url, userAgent, nil)
+	res, err := SendRequest(config, "GET", billingProject, url, userAgent, nil)
 	if err != nil {
 		return handleNotFoundError(err, d, fmt.Sprintf("ArtifactRegistryRepository %q", d.Id()))
 	}
@@ -298,7 +484,19 @@ func resourceArtifactRegistryRepositoryRead(d *schema.ResourceData, meta interfa
 	if err := d.Set("update_time", flattenArtifactRegistryRepositoryUpdateTime(res["updateTime"], d, config)); err != nil {
 		return fmt.Errorf("Error reading Repository: %s", err)
 	}
+	if err := d.Set("docker_config", flattenArtifactRegistryRepositoryDockerConfig(res["dockerConfig"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Repository: %s", err)
+	}
 	if err := d.Set("maven_config", flattenArtifactRegistryRepositoryMavenConfig(res["mavenConfig"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Repository: %s", err)
+	}
+	if err := d.Set("mode", flattenArtifactRegistryRepositoryMode(res["mode"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Repository: %s", err)
+	}
+	if err := d.Set("virtual_repository_config", flattenArtifactRegistryRepositoryVirtualRepositoryConfig(res["virtualRepositoryConfig"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Repository: %s", err)
+	}
+	if err := d.Set("remote_repository_config", flattenArtifactRegistryRepositoryRemoteRepositoryConfig(res["remoteRepositoryConfig"], d, config)); err != nil {
 		return fmt.Errorf("Error reading Repository: %s", err)
 	}
 
@@ -307,7 +505,7 @@ func resourceArtifactRegistryRepositoryRead(d *schema.ResourceData, meta interfa
 
 func resourceArtifactRegistryRepositoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -333,11 +531,23 @@ func resourceArtifactRegistryRepositoryUpdate(d *schema.ResourceData, meta inter
 	} else if v, ok := d.GetOkExists("labels"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, labelsProp)) {
 		obj["labels"] = labelsProp
 	}
+	dockerConfigProp, err := expandArtifactRegistryRepositoryDockerConfig(d.Get("docker_config"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("docker_config"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, dockerConfigProp)) {
+		obj["dockerConfig"] = dockerConfigProp
+	}
 	mavenConfigProp, err := expandArtifactRegistryRepositoryMavenConfig(d.Get("maven_config"), d, config)
 	if err != nil {
 		return err
 	} else if v, ok := d.GetOkExists("maven_config"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, mavenConfigProp)) {
 		obj["mavenConfig"] = mavenConfigProp
+	}
+	virtualRepositoryConfigProp, err := expandArtifactRegistryRepositoryVirtualRepositoryConfig(d.Get("virtual_repository_config"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("virtual_repository_config"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, virtualRepositoryConfigProp)) {
+		obj["virtualRepositoryConfig"] = virtualRepositoryConfigProp
 	}
 
 	url, err := replaceVars(d, config, "{{ArtifactRegistryBasePath}}projects/{{project}}/locations/{{location}}/repositories/{{repository_id}}")
@@ -356,8 +566,16 @@ func resourceArtifactRegistryRepositoryUpdate(d *schema.ResourceData, meta inter
 		updateMask = append(updateMask, "labels")
 	}
 
+	if d.HasChange("docker_config") {
+		updateMask = append(updateMask, "dockerConfig")
+	}
+
 	if d.HasChange("maven_config") {
 		updateMask = append(updateMask, "mavenConfig")
+	}
+
+	if d.HasChange("virtual_repository_config") {
+		updateMask = append(updateMask, "virtualRepositoryConfig")
 	}
 	// updateMask is a URL parameter but not present in the schema, so replaceVars
 	// won't set it
@@ -371,7 +589,7 @@ func resourceArtifactRegistryRepositoryUpdate(d *schema.ResourceData, meta inter
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "PATCH", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
+	res, err := SendRequestWithTimeout(config, "PATCH", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
 
 	if err != nil {
 		return fmt.Errorf("Error updating Repository %q: %s", d.Id(), err)
@@ -384,7 +602,7 @@ func resourceArtifactRegistryRepositoryUpdate(d *schema.ResourceData, meta inter
 
 func resourceArtifactRegistryRepositoryDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -410,12 +628,12 @@ func resourceArtifactRegistryRepositoryDelete(d *schema.ResourceData, meta inter
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
+	res, err := SendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
 	if err != nil {
 		return handleNotFoundError(err, d, "Repository")
 	}
 
-	err = artifactRegistryOperationWaitTime(
+	err = ArtifactRegistryOperationWaitTime(
 		config, res, project, "Deleting Repository", userAgent,
 		d.Timeout(schema.TimeoutDelete))
 
@@ -479,6 +697,23 @@ func flattenArtifactRegistryRepositoryUpdateTime(v interface{}, d *schema.Resour
 	return v
 }
 
+func flattenArtifactRegistryRepositoryDockerConfig(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["immutable_tags"] =
+		flattenArtifactRegistryRepositoryDockerConfigImmutableTags(original["immutableTags"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryDockerConfigImmutableTags(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
 func flattenArtifactRegistryRepositoryMavenConfig(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	if v == nil {
 		return nil
@@ -502,6 +737,161 @@ func flattenArtifactRegistryRepositoryMavenConfigVersionPolicy(v interface{}, d 
 	return v
 }
 
+func flattenArtifactRegistryRepositoryMode(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryVirtualRepositoryConfig(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["upstream_policies"] =
+		flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPolicies(original["upstreamPolicies"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPolicies(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return v
+	}
+	l := v.([]interface{})
+	transformed := make([]interface{}, 0, len(l))
+	for _, raw := range l {
+		original := raw.(map[string]interface{})
+		if len(original) < 1 {
+			// Do not include empty json objects coming back from the api
+			continue
+		}
+		transformed = append(transformed, map[string]interface{}{
+			"id":         flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesId(original["id"], d, config),
+			"repository": flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesRepository(original["repository"], d, config),
+			"priority":   flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesPriority(original["priority"], d, config),
+		})
+	}
+	return transformed
+}
+func flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesId(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesPriority(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	// Handles the string fixed64 format
+	if strVal, ok := v.(string); ok {
+		if intVal, err := StringToFixed64(strVal); err == nil {
+			return intVal
+		}
+	}
+
+	// number values are represented as float64
+	if floatVal, ok := v.(float64); ok {
+		intVal := int(floatVal)
+		return intVal
+	}
+
+	return v // let terraform core handle it otherwise
+}
+
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfig(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["description"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigDescription(original["description"], d, config)
+	transformed["docker_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepository(original["dockerRepository"], d, config)
+	transformed["maven_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepository(original["mavenRepository"], d, config)
+	transformed["npm_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepository(original["npmRepository"], d, config)
+	transformed["python_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepository(original["pythonRepository"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigDescription(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["public_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepositoryPublicRepository(original["publicRepository"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepositoryPublicRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["public_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepositoryPublicRepository(original["publicRepository"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepositoryPublicRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["public_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepositoryPublicRepository(original["publicRepository"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepositoryPublicRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	if len(original) == 0 {
+		return nil
+	}
+	transformed := make(map[string]interface{})
+	transformed["public_repository"] =
+		flattenArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepositoryPublicRepository(original["publicRepository"], d, config)
+	return []interface{}{transformed}
+}
+func flattenArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepositoryPublicRepository(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
 func expandArtifactRegistryRepositoryFormat(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
@@ -522,6 +912,29 @@ func expandArtifactRegistryRepositoryLabels(v interface{}, d TerraformResourceDa
 }
 
 func expandArtifactRegistryRepositoryKmsKeyName(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryDockerConfig(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedImmutableTags, err := expandArtifactRegistryRepositoryDockerConfigImmutableTags(original["immutable_tags"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedImmutableTags); val.IsValid() && !isEmptyValue(val) {
+		transformed["immutableTags"] = transformedImmutableTags
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryDockerConfigImmutableTags(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -556,5 +969,219 @@ func expandArtifactRegistryRepositoryMavenConfigAllowSnapshotOverwrites(v interf
 }
 
 func expandArtifactRegistryRepositoryMavenConfigVersionPolicy(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryMode(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryVirtualRepositoryConfig(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedUpstreamPolicies, err := expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPolicies(original["upstream_policies"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedUpstreamPolicies); val.IsValid() && !isEmptyValue(val) {
+		transformed["upstreamPolicies"] = transformedUpstreamPolicies
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPolicies(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	req := make([]interface{}, 0, len(l))
+	for _, raw := range l {
+		if raw == nil {
+			continue
+		}
+		original := raw.(map[string]interface{})
+		transformed := make(map[string]interface{})
+
+		transformedId, err := expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesId(original["id"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedId); val.IsValid() && !isEmptyValue(val) {
+			transformed["id"] = transformedId
+		}
+
+		transformedRepository, err := expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesRepository(original["repository"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedRepository); val.IsValid() && !isEmptyValue(val) {
+			transformed["repository"] = transformedRepository
+		}
+
+		transformedPriority, err := expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesPriority(original["priority"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedPriority); val.IsValid() && !isEmptyValue(val) {
+			transformed["priority"] = transformedPriority
+		}
+
+		req = append(req, transformed)
+	}
+	return req, nil
+}
+
+func expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesId(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryVirtualRepositoryConfigUpstreamPoliciesPriority(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfig(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedDescription, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigDescription(original["description"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedDescription); val.IsValid() && !isEmptyValue(val) {
+		transformed["description"] = transformedDescription
+	}
+
+	transformedDockerRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepository(original["docker_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedDockerRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["dockerRepository"] = transformedDockerRepository
+	}
+
+	transformedMavenRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepository(original["maven_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedMavenRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["mavenRepository"] = transformedMavenRepository
+	}
+
+	transformedNpmRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepository(original["npm_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedNpmRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["npmRepository"] = transformedNpmRepository
+	}
+
+	transformedPythonRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepository(original["python_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPythonRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["pythonRepository"] = transformedPythonRepository
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigDescription(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPublicRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepositoryPublicRepository(original["public_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPublicRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["publicRepository"] = transformedPublicRepository
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigDockerRepositoryPublicRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPublicRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepositoryPublicRepository(original["public_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPublicRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["publicRepository"] = transformedPublicRepository
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigMavenRepositoryPublicRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPublicRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepositoryPublicRepository(original["public_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPublicRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["publicRepository"] = transformedPublicRepository
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigNpmRepositoryPublicRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPublicRepository, err := expandArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepositoryPublicRepository(original["public_repository"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPublicRepository); val.IsValid() && !isEmptyValue(val) {
+		transformed["publicRepository"] = transformedPublicRepository
+	}
+
+	return transformed, nil
+}
+
+func expandArtifactRegistryRepositoryRemoteRepositoryConfigPythonRepositoryPublicRepository(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud TPU"
-page_title: "Google: google_tpu_node"
 description: |-
   A Cloud TPU instance.
 ---
@@ -34,7 +33,7 @@ To get more information about Node, see:
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
 </div>
-## Example Usage - TPU Node Basic
+## Example Usage - Tpu Node Basic
 
 
 ```hcl
@@ -56,7 +55,7 @@ resource "google_tpu_node" "tpu" {
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
 </div>
-## Example Usage - TPU Node Full
+## Example Usage - Tpu Node Full
 
 
 ```hcl
@@ -199,15 +198,17 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_network_endpoints"></a>The `network_endpoints` block contains:
 
 * `ip_address` -
+  (Output)
   The IP address of this network endpoint.
 
 * `port` -
+  (Output)
   The port of this network endpoint.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

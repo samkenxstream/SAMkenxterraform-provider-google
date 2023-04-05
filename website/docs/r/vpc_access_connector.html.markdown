@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Serverless VPC Access"
-page_title: "Google: google_vpc_access_connector"
 description: |-
   Serverless VPC Access connector resource.
 ---
@@ -34,7 +33,7 @@ To get more information about Connector, see:
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
 </div>
-## Example Usage - VPC Access Connector
+## Example Usage - Vpc Access Connector
 
 
 ```hcl
@@ -49,7 +48,7 @@ resource "google_vpc_access_connector" "connector" {
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
 </div>
-## Example Usage - VPC Access Connector Shared VPC
+## Example Usage - Vpc Access Connector Shared Vpc
 
 
 ```hcl
@@ -155,7 +154,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

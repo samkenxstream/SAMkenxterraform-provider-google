@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Run (v2 API)"
-page_title: "Google: google_cloud_run_v2_service"
 description: |-
   Service acts as a top-level container that manages a set of configurations and revision templates which implement a network service.
 ---
@@ -340,7 +339,7 @@ The following arguments are supported:
 * `execution_environment` -
   (Optional)
   The sandbox environment to host this Revision.
-  Possible values are `EXECUTION_ENVIRONMENT_GEN1` and `EXECUTION_ENVIRONMENT_GEN2`.
+  Possible values are: `EXECUTION_ENVIRONMENT_GEN1`, `EXECUTION_ENVIRONMENT_GEN2`.
 
 * `encryption_key` -
   (Optional)
@@ -370,7 +369,7 @@ The following arguments are supported:
 * `egress` -
   (Optional)
   Traffic VPC egress settings.
-  Possible values are `ALL_TRAFFIC` and `PRIVATE_RANGES_ONLY`.
+  Possible values are: `ALL_TRAFFIC`, `PRIVATE_RANGES_ONLY`.
 
 <a name="nested_containers"></a>The `containers` block supports:
 
@@ -510,13 +509,18 @@ The following arguments are supported:
 
 * `http_get` -
   (Optional)
-  HTTPGet specifies the http request to perform. Exactly one of HTTPGet or TCPSocket must be specified.
+  HTTPGet specifies the http request to perform.
   Structure is [documented below](#nested_http_get).
 
 * `tcp_socket` -
-  (Optional)
-  TCPSocket specifies an action involving a TCP port. Exactly one of HTTPGet or TCPSocket must be specified.
+  (Optional, Deprecated)
+  TCPSocket specifies an action involving a TCP port. This field is not supported in liveness probe currently.
   Structure is [documented below](#nested_tcp_socket).
+
+* `grpc` -
+  (Optional)
+  GRPC specifies an action involving a GRPC port.
+  Structure is [documented below](#nested_grpc).
 
 
 <a name="nested_http_get"></a>The `http_get` block supports:
@@ -546,6 +550,18 @@ The following arguments are supported:
 * `port` -
   (Optional)
   Port number to access on the container. Must be in the range 1 to 65535. If not specified, defaults to 8080.
+
+<a name="nested_grpc"></a>The `grpc` block supports:
+
+* `port` -
+  (Optional)
+  Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.
+
+* `service` -
+  (Optional)
+  The name of the service to place in the gRPC HealthCheckRequest
+  (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+  If this is not specified, the default behavior is defined by gRPC.
 
 <a name="nested_startup_probe"></a>The `startup_probe` block supports:
 
@@ -575,6 +591,11 @@ The following arguments are supported:
   TCPSocket specifies an action involving a TCP port. Exactly one of HTTPGet or TCPSocket must be specified.
   Structure is [documented below](#nested_tcp_socket).
 
+* `grpc` -
+  (Optional)
+  GRPC specifies an action involving a GRPC port.
+  Structure is [documented below](#nested_grpc).
+
 
 <a name="nested_http_get"></a>The `http_get` block supports:
 
@@ -603,6 +624,18 @@ The following arguments are supported:
 * `port` -
   (Optional)
   Port number to access on the container. Must be in the range 1 to 65535. If not specified, defaults to 8080.
+
+<a name="nested_grpc"></a>The `grpc` block supports:
+
+* `port` -
+  (Optional)
+  Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.
+
+* `service` -
+  (Optional)
+  The name of the service to place in the gRPC HealthCheckRequest
+  (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+  If this is not specified, the default behavior is defined by gRPC.
 
 <a name="nested_volumes"></a>The `volumes` block supports:
 
@@ -683,12 +716,12 @@ The following arguments are supported:
 * `ingress` -
   (Optional)
   Provides the ingress settings for this Service. On output, returns the currently observed ingress settings, or INGRESS_TRAFFIC_UNSPECIFIED if no revision is active.
-  Possible values are `INGRESS_TRAFFIC_ALL`, `INGRESS_TRAFFIC_INTERNAL_ONLY`, and `INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER`.
+  Possible values are: `INGRESS_TRAFFIC_ALL`, `INGRESS_TRAFFIC_INTERNAL_ONLY`, `INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER`.
 
 * `launch_stage` -
   (Optional)
   The launch stage as defined by Google Cloud Platform Launch Stages. Cloud Run supports ALPHA, BETA, and GA. If no value is specified, GA is assumed.
-  Possible values are `UNIMPLEMENTED`, `PRELAUNCH`, `EARLY_ACCESS`, `ALPHA`, `BETA`, `GA`, and `DEPRECATED`.
+  Possible values are: `UNIMPLEMENTED`, `PRELAUNCH`, `EARLY_ACCESS`, `ALPHA`, `BETA`, `GA`, `DEPRECATED`.
 
 * `binary_authorization` -
   (Optional)
@@ -723,7 +756,7 @@ The following arguments are supported:
 * `type` -
   (Optional)
   The allocation type for this traffic target.
-  Possible values are `TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST` and `TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION`.
+  Possible values are: `TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST`, `TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION`.
 
 * `revision` -
   (Optional)
@@ -786,77 +819,98 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_terminal_condition"></a>The `terminal_condition` block contains:
 
 * `type` -
+  (Output)
   type is used to communicate the status of the reconciliation process. See also: https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting Types common to all resources include: * "Ready": True when the Resource is ready.
 
 * `state` -
+  (Output)
   State of the condition.
 
 * `message` -
+  (Output)
   Human readable message indicating details about the current status.
 
 * `last_transition_time` -
+  (Output)
   Last time the condition transitioned from one status to another.
 
 * `severity` -
+  (Output)
   How to interpret failures of this condition, one of Error, Warning, Info
 
 * `reason` -
+  (Output)
   A common (service-level) reason for this condition.
 
 * `revision_reason` -
+  (Output)
   A reason for the revision condition.
 
 * `execution_reason` -
+  (Output)
   A reason for the execution condition.
 
 <a name="nested_conditions"></a>The `conditions` block contains:
 
 * `type` -
+  (Output)
   type is used to communicate the status of the reconciliation process. See also: https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting Types common to all resources include: * "Ready": True when the Resource is ready.
 
 * `state` -
+  (Output)
   State of the condition.
 
 * `message` -
+  (Output)
   Human readable message indicating details about the current status.
 
 * `last_transition_time` -
+  (Output)
   Last time the condition transitioned from one status to another.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
 * `severity` -
+  (Output)
   How to interpret failures of this condition, one of Error, Warning, Info
 
 * `reason` -
+  (Output)
   A common (service-level) reason for this condition.
 
 * `revision_reason` -
+  (Output)
   A reason for the revision condition.
 
 * `execution_reason` -
+  (Output)
   A reason for the execution condition.
 
 <a name="nested_traffic_statuses"></a>The `traffic_statuses` block contains:
 
 * `type` -
+  (Output)
   The allocation type for this traffic target.
 
 * `revision` -
+  (Output)
   Revision to which this traffic is sent.
 
 * `percent` -
+  (Output)
   Specifies percent of the traffic to this Revision.
 
 * `tag` -
+  (Output)
   Indicates the string used in the URI to exclusively reference this target.
 
 * `uri` -
+  (Output)
   Displays the target URI.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

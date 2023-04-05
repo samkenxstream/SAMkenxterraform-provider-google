@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_router_peer"
 description: |-
   BGP information that must be configured into the routing stack to
   establish BGP peering.
@@ -250,7 +249,7 @@ The following arguments are supported:
   User-specified flag to indicate which mode to use for advertisement.
   Valid values of this enum field are: `DEFAULT`, `CUSTOM`
   Default value is `DEFAULT`.
-  Possible values are `DEFAULT` and `CUSTOM`.
+  Possible values are: `DEFAULT`, `CUSTOM`.
 
 * `advertised_groups` -
   (Optional)
@@ -322,7 +321,7 @@ The following arguments are supported:
   for this BGP peer. If set to `PASSIVE`, the Cloud Router will wait
   for the peer router to initiate the BFD session for this BGP peer.
   If set to `DISABLED`, BFD is disabled for this BGP peer.
-  Possible values are `ACTIVE`, `DISABLED`, and `PASSIVE`.
+  Possible values are: `ACTIVE`, `DISABLED`, `PASSIVE`.
 
 * `min_transmit_interval` -
   (Optional)
@@ -367,7 +366,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

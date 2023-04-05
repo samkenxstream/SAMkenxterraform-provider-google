@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Firebase Realtime Database"
-page_title: "Google: google_firebase_database_instance"
 description: |-
   A Firebase Realtime Database instance.
 ---
@@ -116,7 +115,7 @@ The following arguments are supported:
   Creating user Databases is only available for projects on the Blaze plan.
   Projects can be upgraded using the Cloud Billing API https://cloud.google.com/billing/reference/rest/v1/projects/updateBillingInfo.
   Default value is `USER_DATABASE`.
-  Possible values are `DEFAULT_DATABASE` and `USER_DATABASE`.
+  Possible values are: `DEFAULT_DATABASE`, `USER_DATABASE`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -146,7 +145,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

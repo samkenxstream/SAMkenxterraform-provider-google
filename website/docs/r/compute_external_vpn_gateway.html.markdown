@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_external_vpn_gateway"
 description: |-
   Represents a VPN gateway managed outside of GCP.
 ---
@@ -162,10 +161,14 @@ The following arguments are supported:
   (Optional)
   An optional description of this resource.
 
+* `labels` -
+  (Optional)
+  Labels for the external VPN gateway resource.
+
 * `redundancy_type` -
   (Optional)
   Indicates the redundancy type of this external VPN gateway
-  Possible values are `FOUR_IPS_REDUNDANCY`, `SINGLE_IP_INTERNALLY_REDUNDANT`, and `TWO_IPS_REDUNDANCY`.
+  Possible values are: `FOUR_IPS_REDUNDANCY`, `SINGLE_IP_INTERNALLY_REDUNDANT`, `TWO_IPS_REDUNDANCY`.
 
 * `interface` -
   (Optional)
@@ -204,7 +207,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

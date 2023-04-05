@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Data catalog"
-page_title: "Google: google_data_catalog_tag"
 description: |-
   Tags are used to attach custom metadata to Data Catalog resources.
 ---
@@ -353,9 +352,11 @@ The following arguments are supported:
 * `field_name` - (Required) The identifier for this object. Format specified above.
 
 * `display_name` -
+  (Output)
   The display name of this field
 
 * `order` -
+  (Output)
   The order of this field with respect to other fields in this tag. For example, a higher value can indicate
   a more important field. The value can be negative. Multiple fields can have the same order, and field orders
   within a tag do not have to be sequential.
@@ -415,7 +416,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud (Stackdriver) Monitoring"
-page_title: "Google: google_monitoring_service"
 description: |-
   A Service is a discrete, autonomous, and network-accessible unit,
   designed to solve an individual concern (Wikipedia).
@@ -91,7 +90,7 @@ The following arguments are supported:
 * `basic_service` -
   (Optional)
   A well-known service type, defined by its service type and service labels.
-  Valid values are described at
+  Valid values of service types and services labels are described at
   https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring/api/api-structures#basic-svc-w-basic-sli
   Structure is [documented below](#nested_basic_service).
 
@@ -137,7 +136,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

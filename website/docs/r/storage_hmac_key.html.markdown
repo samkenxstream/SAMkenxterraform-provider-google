@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Storage"
-page_title: "Google: google_storage_hmac_key"
 description: |-
   The hmacKeys resource represents an HMAC key within Cloud Storage.
 ---
@@ -35,8 +34,9 @@ To get more information about HmacKey, see:
 state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 On import, the `secret` value will not be retrieved.
 
-~> **Warning:** All arguments including `secret` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `secret`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
   <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=storage_hmac_key&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
@@ -75,7 +75,7 @@ The following arguments are supported:
   (Optional)
   The state of the key. Can be set to one of ACTIVE, INACTIVE.
   Default value is `ACTIVE`.
-  Possible values are `ACTIVE` and `INACTIVE`.
+  Possible values are: `ACTIVE`, `INACTIVE`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -104,7 +104,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Document AI"
-page_title: "Google: google_document_ai_processor_default_version"
 description: |-
   The default version for the processor.
 ---
@@ -41,7 +40,14 @@ resource "google_document_ai_processor" "processor" {
 
 resource "google_document_ai_processor_default_version" "processor" {
   processor = google_document_ai_processor.processor.id
-  version = "${google_document_ai_processor.processor.id}/processorVersions/pretrained-next"
+  version = "${google_document_ai_processor.processor.id}/processorVersions/stable"
+
+  lifecycle {
+    ignore_changes = [
+      # Using "stable" or "rc" will return a specific version from the API; suppressing the diff.
+      version,
+    ]
+  }
 }
 ```
 
@@ -52,7 +58,8 @@ The following arguments are supported:
 
 * `version` -
   (Required)
-  The version to set
+  The version to set. Using `stable` or `rc` will cause the API to return the latest version in that release channel.
+  Apply `lifecycle.ignore_changes` to the `version` field to suppress this diff.
 
 * `processor` -
   (Required)
@@ -73,7 +80,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

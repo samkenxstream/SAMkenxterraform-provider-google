@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Firebase"
-page_title: "Google: google_firebase_android_app"
 description: |-
   A Google Cloud Firebase Android application instance
 ---
@@ -71,14 +70,12 @@ The following arguments are supported:
   (Optional)
   The SHA256 certificate hashes for the AndroidApp.
 
-* `deletion_policy` -
-  (Optional)
-  (Optional) Set to `ABANDON` to allow the AndroidApp to be untracked from terraform state
-  rather than deleted upon `terraform destroy`. This is useful because the AndroidApp may be
-  serving traffic. Set to `DELETE` to delete the AndroidApp. Default to `DELETE`.
-
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
+
+* `deletion_policy` - (Optional) (Optional) Set to `ABANDON` to allow the AndroidApp to be untracked from terraform state
+rather than deleted upon `terraform destroy`. This is useful because the AndroidApp may be
+serving traffic. Set to `DELETE` to delete the AndroidApp. Defaults to `DELETE`.
 
 
 ## Attributes Reference
@@ -103,7 +100,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Key Management Service"
-page_title: "Google: google_kms_secret_ciphertext"
 description: |-
   Encrypts secret data with Google Cloud KMS and provides access to the ciphertext.
 ---
@@ -35,8 +34,9 @@ To get more information about SecretCiphertext, see:
 * How-to Guides
     * [Encrypting and decrypting data with a symmetric key](https://cloud.google.com/kms/docs/encrypt-decrypt)
 
-~> **Warning:** All arguments including `plaintext` and `additional_authenticated_data` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `plaintext`, `additional_authenticated_data`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 ## Example Usage - Kms Secret Ciphertext Basic
 
@@ -124,7 +124,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

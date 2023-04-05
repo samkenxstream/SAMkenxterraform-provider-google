@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Data catalog"
-page_title: "Google: google_data_catalog_tag_template"
 description: |-
   A tag template defines a tag, which can have one or more typed fields.
 ---
@@ -103,6 +102,7 @@ The following arguments are supported:
 * `field_id` - (Required) The identifier for this object. Format specified above.
 
 * `name` -
+  (Output)
   The resource name of the tag template field in URL format. Example: projects/{project_id}/locations/{location}/tagTemplates/{tagTemplateId}/fields/{field}
 
 * `display_name` -
@@ -135,7 +135,7 @@ The following arguments are supported:
   (Optional)
   Represents primitive types - string, bool etc.
    Exactly one of `primitive_type` or `enum_type` must be set
-  Possible values are `DOUBLE`, `STRING`, `BOOL`, and `TIMESTAMP`.
+  Possible values are: `DOUBLE`, `STRING`, `BOOL`, `TIMESTAMP`.
 
 * `enum_type` -
   (Optional)
@@ -194,7 +194,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

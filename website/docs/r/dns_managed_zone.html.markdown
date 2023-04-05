@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud DNS"
-page_title: "Google: google_dns_managed_zone"
 description: |-
   A zone is a subtree of the DNS namespace under one administrative
   responsibility.
@@ -353,7 +352,7 @@ The following arguments are supported:
   The zone's visibility: public zones are exposed to the Internet,
   while private zones are visible only to Virtual Private Cloud resources.
   Default value is `public`.
-  Possible values are `private` and `public`.
+  Possible values are: `private`, `public`.
 
 * `private_visibility_config` -
   (Optional)
@@ -405,12 +404,12 @@ The following arguments are supported:
   (Optional)
   Specifies the mechanism used to provide authenticated denial-of-existence responses.
   non_existence can only be updated when the state is `off`.
-  Possible values are `nsec` and `nsec3`.
+  Possible values are: `nsec`, `nsec3`.
 
 * `state` -
   (Optional)
   Specifies whether DNSSEC is enabled, and what mode it is in
-  Possible values are `off`, `on`, and `transfer`.
+  Possible values are: `off`, `on`, `transfer`.
 
 * `default_key_specs` -
   (Optional)
@@ -426,7 +425,7 @@ The following arguments are supported:
 * `algorithm` -
   (Optional)
   String mnemonic specifying the DNSSEC algorithm of this key
-  Possible values are `ecdsap256sha256`, `ecdsap384sha384`, `rsasha1`, `rsasha256`, and `rsasha512`.
+  Possible values are: `ecdsap256sha256`, `ecdsap384sha384`, `rsasha1`, `rsasha256`, `rsasha512`.
 
 * `key_length` -
   (Optional)
@@ -440,7 +439,7 @@ The following arguments are supported:
   resource record sets of type DNSKEY. Zone signing keys do
   not have the Secure Entry Point flag set and will be used
   to sign all other types of resource record sets.
-  Possible values are `keySigning` and `zoneSigning`.
+  Possible values are: `keySigning`, `zoneSigning`.
 
 * `kind` -
   (Optional)
@@ -500,7 +499,7 @@ The following arguments are supported:
   Forwarding path for this TargetNameServer. If unset or `default` Cloud DNS will make forwarding
   decision based on address ranges, i.e. RFC1918 addresses go to the VPC, Non-RFC1918 addresses go
   to the Internet. When set to `private`, Cloud DNS will always send queries through VPC for this target
-  Possible values are `default` and `private`.
+  Possible values are: `default`, `private`.
 
 <a name="nested_peering_config"></a>The `peering_config` block supports:
 
@@ -563,7 +562,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

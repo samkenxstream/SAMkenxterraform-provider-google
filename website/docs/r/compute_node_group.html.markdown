@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_node_group"
 description: |-
   Represents a NodeGroup resource to manage a group of sole-tenant nodes.
 ---
@@ -197,7 +196,7 @@ The following arguments are supported:
     - ONLY_SCALE_OUT: Enables only scaling out.
     You must use this mode if your node groups are configured to
     restart their hosted VMs on minimal servers.
-  Possible values are `OFF`, `ON`, and `ONLY_SCALE_OUT`.
+  Possible values are: `OFF`, `ON`, `ONLY_SCALE_OUT`.
 
 * `min_nodes` -
   (Optional)
@@ -214,7 +213,7 @@ The following arguments are supported:
 * `share_type` -
   (Required)
   Node group sharing type.
-  Possible values are `ORGANIZATION`, `SPECIFIC_PROJECTS`, and `LOCAL`.
+  Possible values are: `ORGANIZATION`, `SPECIFIC_PROJECTS`, `LOCAL`.
 
 * `project_map` -
   (Optional)
@@ -244,7 +243,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

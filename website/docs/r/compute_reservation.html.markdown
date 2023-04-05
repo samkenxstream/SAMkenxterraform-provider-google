@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_reservation"
 description: |-
   Represents a reservation resource.
 ---
@@ -91,6 +90,7 @@ The following arguments are supported:
   The number of resources that are allocated.
 
 * `in_use_count` -
+  (Output)
   How many instances are in use.
 
 * `instance_properties` -
@@ -144,7 +144,7 @@ The following arguments are supported:
   (Optional)
   The disk interface to use for attaching this disk.
   Default value is `SCSI`.
-  Possible values are `SCSI` and `NVME`.
+  Possible values are: `SCSI`, `NVME`.
 
 * `disk_size_gb` -
   (Required)
@@ -177,7 +177,7 @@ The following arguments are supported:
 * `share_type` -
   (Optional)
   Type of sharing for this shared-reservation
-  Possible values are `LOCAL` and `SPECIFIC_PROJECTS`.
+  Possible values are: `LOCAL`, `SPECIFIC_PROJECTS`.
 
 * `project_map` -
   (Optional)
@@ -214,7 +214,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

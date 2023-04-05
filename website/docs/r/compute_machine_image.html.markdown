@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_machine_image"
 description: |-
   Represents a Machine Image resource.
 ---
@@ -44,7 +43,7 @@ To get more information about MachineImage, see:
 ```hcl
 resource "google_compute_instance" "vm" {
   provider     = google-beta
-  name         = "vm"
+  name         = "my-vm"
   machine_type = "e2-medium"
 
   boot_disk {
@@ -60,7 +59,7 @@ resource "google_compute_instance" "vm" {
 
 resource "google_compute_machine_image" "image" {
   provider        = google-beta
-  name            = "image"
+  name            = "my-image"
   source_instance = google_compute_instance.vm.self_link
 }
 ```
@@ -75,7 +74,7 @@ resource "google_compute_machine_image" "image" {
 ```hcl
 resource "google_compute_instance" "vm" {
   provider     = google-beta
-  name         = "vm"
+  name         = "my-vm"
   machine_type = "e2-medium"
 
   boot_disk {
@@ -91,7 +90,7 @@ resource "google_compute_instance" "vm" {
 
 resource "google_compute_machine_image" "image" {
   provider        = google-beta
-  name            = "image"
+  name            = "my-image"
   source_instance = google_compute_instance.vm.self_link
   machine_image_encryption_key {
     kms_key_name = google_kms_crypto_key.crypto_key.id
@@ -169,6 +168,7 @@ The following arguments are supported:
   RFC 4648 base64 to either encrypt or decrypt this resource.
 
 * `sha256` -
+  (Output)
   The RFC 4648 base64 encoded SHA-256 hash of the
   customer-supplied encryption key that protects this resource.
 
@@ -195,7 +195,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

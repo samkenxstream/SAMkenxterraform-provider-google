@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "NetworkManagement"
-page_title: "Google: google_network_management_connectivity_test"
 description: |-
   A connectivity test are a static analysis of your resource configurations
   that enables you to evaluate connectivity to and from Google Cloud
@@ -227,7 +226,7 @@ The following arguments are supported:
 * `network_type` -
   (Optional)
   Type of the network where the endpoint is located.
-  Possible values are `GCP_NETWORK` and `NON_GCP_NETWORK`.
+  Possible values are: `GCP_NETWORK`, `NON_GCP_NETWORK`.
 
 * `project_id` -
   (Optional)
@@ -309,7 +308,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

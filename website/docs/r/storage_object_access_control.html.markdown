@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Storage"
-page_title: "Google: google_storage_object_access_control"
 description: |-
   The ObjectAccessControls resources represent the Access Control Lists
   (ACLs) for objects within Google Cloud Storage.
@@ -97,7 +96,7 @@ The following arguments are supported:
 * `role` -
   (Required)
   The access permission for the entity.
-  Possible values are `OWNER` and `READER`.
+  Possible values are: `OWNER`, `READER`.
 
 
 - - -
@@ -136,12 +135,12 @@ In addition to the arguments listed above, the following computed attributes are
 * `team` -
   (Optional)
   The team.
-  Possible values are `editors`, `owners`, and `viewers`.
+  Possible values are: `editors`, `owners`, `viewers`.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

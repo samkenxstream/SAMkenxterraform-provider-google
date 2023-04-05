@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Firestore"
-page_title: "Google: google_firestore_document"
 description: |-
   In Cloud Firestore, the unit of storage is the document.
 ---
@@ -31,9 +30,12 @@ To get more information about Document, see:
     * [Official Documentation](https://cloud.google.com/firestore/docs/manage-data/add-data)
 
 ~> **Warning:** This resource creates a Firestore Document on a project that already has
-Firestore enabled. If you haven't already enabled it, you can create a
+a Firestore database. If you haven't already created it, you may
+create a `google_firestore_database` resource with `type` set to
+`"FIRESTORE_NATIVE"` and `location_id` set to your chosen location.
+If you wish to use App Engine, you may instead create a
 `google_app_engine_application` resource with `database_type` set to
-`"CLOUD_FIRESTORE"` to do so. Your Firestore location will be the same as
+`"CLOUD_FIRESTORE"`. Your Firestore location will be the same as
 the App Engine location specified.
 
 ## Example Usage - Firestore Document Basic
@@ -125,7 +127,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BigQuery Connection"
-page_title: "Google: google_bigquery_connection"
 description: |-
   A connection allows BigQuery connections to external data sources.
 ---
@@ -29,8 +28,9 @@ To get more information about Connection, see:
 * How-to Guides
     * [Cloud SQL federated queries](https://cloud.google.com/bigquery/docs/cloud-sql-federated-queries)
 
-~> **Warning:** All arguments including `cloud_sql.credential.password` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `cloud_sql.credential.password`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
   <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=bigquery_connection_cloud_resource&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
@@ -189,6 +189,7 @@ resource "google_bigquery_connection" "connection" {
    description   = "a riveting description"
    azure {
       customer_tenant_id = "customer-tenant-id"
+      federated_application_client_id = "b43eeeee-eeee-eeee-eeee-a480155501ce"
    }
 }
 ```
@@ -245,7 +246,7 @@ The following arguments are supported:
 
 * `cloud_sql` -
   (Optional)
-  A nested object resource
+  Connection properties specific to the Cloud SQL.
   Structure is [documented below](#nested_cloud_sql).
 
 * `aws` -
@@ -290,7 +291,11 @@ The following arguments are supported:
 * `type` -
   (Required)
   Type of the Cloud SQL database.
-  Possible values are `DATABASE_TYPE_UNSPECIFIED`, `POSTGRES`, and `MYSQL`.
+  Possible values are: `DATABASE_TYPE_UNSPECIFIED`, `POSTGRES`, `MYSQL`.
+
+* `service_account_id` -
+  (Output)
+  When the connection is used in the context of an operation in BigQuery, this service account will serve as the identity being used for connecting to the CloudSQL instance specified in this connection.
 
 
 <a name="nested_credential"></a>The `credential` block supports:
@@ -319,25 +324,38 @@ The following arguments are supported:
   The user’s AWS IAM Role that trusts the Google-owned AWS IAM user Connection.
 
 * `identity` -
+  (Output)
   A unique Google-owned and Google-generated identity for the Connection. This identity will be used to access the user's AWS IAM Role.
 
 <a name="nested_azure"></a>The `azure` block supports:
 
 * `application` -
+  (Output)
   The name of the Azure Active Directory Application.
 
 * `client_id` -
+  (Output)
   The client id of the Azure Active Directory Application.
 
 * `object_id` -
+  (Output)
   The object id of the Azure Active Directory Application.
 
 * `customer_tenant_id` -
   (Required)
   The id of customer's directory that host the data.
 
+* `federated_application_client_id` -
+  (Optional)
+  The Azure Application (client) ID where the federated credentials will be hosted.
+
 * `redirect_uri` -
+  (Output)
   The URL user will be redirected to after granting consent during connection setup.
+
+* `identity` -
+  (Output)
+  A unique Google-owned and Google-generated identity for the Connection. This identity will be used to access the user's Azure Active Directory Application.
 
 <a name="nested_cloud_spanner"></a>The `cloud_spanner` block supports:
 
@@ -349,9 +367,14 @@ The following arguments are supported:
   (Optional)
   If parallelism should be used when reading from Cloud Spanner
 
+* `use_serverless_analytics` -
+  (Optional)
+  If the serverless analytics service should be used to read data from Cloud Spanner. useParallelism must be set when using serverless analytics
+
 <a name="nested_cloud_resource"></a>The `cloud_resource` block supports:
 
 * `service_account_id` -
+  (Output)
   The account ID of the service created for the purpose of this connection.
 
 ## Attributes Reference
@@ -371,7 +394,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

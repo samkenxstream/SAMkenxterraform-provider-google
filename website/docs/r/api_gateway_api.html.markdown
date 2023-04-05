@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "API Gateway"
-page_title: "Google: google_api_gateway_api"
 description: |-
   A consumable API that can be used by multiple Gateways.
 ---
@@ -42,7 +41,7 @@ To get more information about Api, see:
 ```hcl
 resource "google_api_gateway_api" "api" {
   provider = google-beta
-  api_id = "api"
+  api_id = "my-api"
 }
 ```
 
@@ -92,7 +91,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

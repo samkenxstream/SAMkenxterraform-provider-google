@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Vertex AI"
-page_title: "Google: google_vertex_ai_featurestore_entitytype"
 description: |-
   An entity type is a type of object in a system that needs to be modeled and have stored information about.
 ---
@@ -52,6 +51,7 @@ resource "google_vertex_ai_featurestore_entitytype" "entity" {
   labels = {
     foo = "bar"
   }
+  description = "test description"
   featurestore = google_vertex_ai_featurestore.featurestore.id
   monitoring_config {
     snapshot_analysis {
@@ -112,6 +112,7 @@ resource "google_vertex_ai_featurestore_entitytype" "entity" {
       value = 0.3
     }
   }
+  offline_storage_ttl_days = 30
 }
 ```
 
@@ -132,6 +133,10 @@ The following arguments are supported:
   (Optional)
   The name of the EntityType. This value may be up to 60 characters, and valid characters are [a-z0-9_]. The first character cannot be a number.
 
+* `description` -
+  (Optional)
+  Optional. Description of the EntityType.
+
 * `labels` -
   (Optional)
   A set of key/value label pairs to assign to this EntityType.
@@ -141,6 +146,10 @@ The following arguments are supported:
   The default monitoring configuration for all Features under this EntityType.
   If this is populated with [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is disabled.
   Structure is [documented below](#nested_monitoring_config).
+
+* `offline_storage_ttl_days` -
+  (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
+  Config for data retention policy in offline storage. TTL in days for feature values that will be stored in offline storage. The Feature Store offline storage periodically removes obsolete feature values older than offlineStorageTtlDays since the feature generation time. If unset (or explicitly set to 0), default to 4000 days TTL.
 
 
 <a name="nested_monitoring_config"></a>The `monitoring_config` block supports:
@@ -233,7 +242,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud IoT Core"
-page_title: "Google: google_cloudiot_device"
 description: |-
   A Google Cloud IoT Core device.
 ---
@@ -104,7 +103,7 @@ The following arguments are supported:
 * `log_level` -
   (Optional)
   The logging verbosity for device activity.
-  Possible values are `NONE`, `ERROR`, `INFO`, and `DEBUG`.
+  Possible values are: `NONE`, `ERROR`, `INFO`, `DEBUG`.
 
 * `metadata` -
   (Optional)
@@ -133,7 +132,7 @@ The following arguments are supported:
 * `format` -
   (Required)
   The format of the key.
-  Possible values are `RSA_PEM`, `RSA_X509_PEM`, `ES256_PEM`, and `ES256_X509_PEM`.
+  Possible values are: `RSA_PEM`, `RSA_X509_PEM`, `ES256_PEM`, `ES256_X509_PEM`.
 
 * `key` -
   (Required)
@@ -145,17 +144,19 @@ The following arguments are supported:
   (Optional)
   Indicates whether the device is a gateway.
   Default value is `NON_GATEWAY`.
-  Possible values are `GATEWAY` and `NON_GATEWAY`.
+  Possible values are: `GATEWAY`, `NON_GATEWAY`.
 
 * `gateway_auth_method` -
   (Optional)
   Indicates whether the device is a gateway.
-  Possible values are `ASSOCIATION_ONLY`, `DEVICE_AUTH_TOKEN_ONLY`, and `ASSOCIATION_AND_DEVICE_AUTH_TOKEN`.
+  Possible values are: `ASSOCIATION_ONLY`, `DEVICE_AUTH_TOKEN_ONLY`, `ASSOCIATION_AND_DEVICE_AUTH_TOKEN`.
 
 * `last_accessed_gateway_id` -
+  (Output)
   The ID of the gateway the device accessed most recently.
 
 * `last_accessed_gateway_time` -
+  (Output)
   The most recent time at which the device accessed the gateway specified in last_accessed_gateway.
 
 ## Attributes Reference
@@ -216,12 +217,15 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_config"></a>The `config` block contains:
 
 * `version` -
+  (Output)
   The version of this update.
 
 * `cloud_update_time` -
+  (Output)
   The time at which this configuration version was updated in Cloud IoT Core.
 
 * `device_ack_time` -
+  (Output)
   The time at which Cloud IoT Core received the acknowledgment from the device,
   indicating that the device has received this configuration version.
 
@@ -242,7 +246,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

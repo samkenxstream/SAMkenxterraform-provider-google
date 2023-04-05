@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Security Command Center (SCC)"
-page_title: "Google: google_scc_notification_config"
 description: |-
   A Cloud Security Command Center (Cloud SCC) notification configs.
 ---
@@ -24,7 +23,7 @@ A Cloud Security Command Center (Cloud SCC) notification configs. A
 notification config is a Cloud SCC resource that contains the
 configuration to send notifications for create/update events of
 findings, assets and etc.
-~> **Note:** In order to use Cloud SCC resources, your organization must be enrolled 
+~> **Note:** In order to use Cloud SCC resources, your organization must be enrolled
 in [SCC Standard/Premium](https://cloud.google.com/security-command-center/docs/quickstart-security-command-center).
 Without doing so, you may run into errors during resource creation.
 
@@ -130,7 +129,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

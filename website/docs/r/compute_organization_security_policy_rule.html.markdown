@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_organization_security_policy_rule"
 description: |-
   A rule for the OrganizationSecurityPolicy.
 ---
@@ -102,7 +101,7 @@ The following arguments are supported:
   Preconfigured versioned expression. For organization security policy rules,
   the only supported type is "FIREWALL".
   Default value is `FIREWALL`.
-  Possible values are `FIREWALL`.
+  Possible values are: `FIREWALL`.
 
 * `config` -
   (Required)
@@ -161,7 +160,7 @@ The following arguments are supported:
 * `direction` -
   (Optional)
   The direction in which this rule applies. If unspecified an INGRESS rule is created.
-  Possible values are `INGRESS` and `EGRESS`.
+  Possible values are: `INGRESS`, `EGRESS`.
 
 * `target_resources` -
   (Optional)
@@ -192,7 +191,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

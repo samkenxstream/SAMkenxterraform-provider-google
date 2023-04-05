@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Vertex AI"
-page_title: "Google: google_vertex_ai_index"
 description: |-
   A representation of a collection of database items organized in a way that allows for approximate nearest neighbor (a.
 ---
@@ -32,7 +31,7 @@ To get more information about Index, see:
 
 ```hcl
 resource "google_storage_bucket" "bucket" {
-  name     = "my-project-name-vertex-ai-index-test"  # Every bucket name must be globally unique
+  name     = "vertex-ai-index-test"
   location = "us-central1"
   uniform_bucket_level_access = true
 }
@@ -77,7 +76,7 @@ resource "google_vertex_ai_index" "index" {
 
 ```hcl
 resource "google_storage_bucket" "bucket" {
-  name     = "my-project-name-vertex-ai-index-test"  # Every bucket name must be globally unique
+  name     = "vertex-ai-index-test"
   location = "us-central1"
   uniform_bucket_level_access = true
 }
@@ -268,23 +267,27 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_deployed_indexes"></a>The `deployed_indexes` block contains:
 
 * `index_endpoint` -
+  (Output)
   A resource name of the IndexEndpoint.
 
 * `deployed_index_id` -
+  (Output)
   The ID of the DeployedIndex in the above IndexEndpoint.
 
 <a name="nested_index_stats"></a>The `index_stats` block contains:
 
 * `vectors_count` -
+  (Output)
   The number of vectors in the Index.
 
 * `shards_count` -
+  (Output)
   The number of shards in the Index.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 60 minutes.
 - `update` - Default is 60 minutes.

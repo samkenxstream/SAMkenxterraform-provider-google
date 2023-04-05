@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "App Engine"
-page_title: "Google: google_app_engine_service_split_traffic"
 description: |-
   Traffic routing configuration for versions within a single service.
 ---
@@ -114,7 +113,7 @@ The following arguments are supported:
 * `shard_by` -
   (Optional)
   Mechanism used to determine which version a request is sent to. The traffic selection algorithm will be stable for either type until allocations are changed.
-  Possible values are `UNSPECIFIED`, `COOKIE`, `IP`, and `RANDOM`.
+  Possible values are: `UNSPECIFIED`, `COOKIE`, `IP`, `RANDOM`.
 
 * `allocations` -
   (Required)
@@ -141,7 +140,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

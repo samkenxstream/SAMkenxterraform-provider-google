@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Tags"
-page_title: "Google: google_tags_tag_key"
 description: |-
   A TagKey, used to group a set of TagValues.
 ---
@@ -66,7 +65,7 @@ The following arguments are supported:
   (Optional)
   Optional. A purpose cannot be changed once set.
   A purpose denotes that this Tag is intended for use in policies of a specific policy engine, and will involve that policy engine in management operations involving this Tag.
-  Possible values are `GCE_FIREWALL`.
+  Possible values are: `GCE_FIREWALL`.
 
 * `purpose_data` -
   (Optional)
@@ -98,7 +97,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Build"
-page_title: "Google: google_cloudbuild_trigger"
 description: |-
   Configuration for an automated build in response to source repository changes.
 ---
@@ -164,7 +163,7 @@ resource "google_cloudbuild_trigger" "service-account-trigger" {
 }
 
 resource "google_service_account" "cloudbuild_service_account" {
-  account_id = "my-service-account"
+  account_id = "tf-test-my-service-account"
 }
 
 resource "google_project_iam_member" "act_as" {
@@ -369,6 +368,122 @@ git_file_source {
   }
 }
 ```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=cloudbuild_trigger_repo&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Cloudbuild Trigger Repo
+
+
+```hcl
+resource "google_cloudbuildv2_connection" "my-connection" {
+  provider = google-beta
+  location = "us-central1"
+  name = "my-connection"
+
+  github_config {
+    app_installation_id = 123123
+    authorizer_credential {
+      oauth_token_secret_version = "projects/my-project/secrets/github-pat-secret/versions/latest"
+    }
+  }
+}
+
+resource "google_cloudbuildv2_repository" "my-repository" {
+  provider = google-beta
+  name = "my-repo"
+  parent_connection = google_cloudbuildv2_connection.my-connection.id
+  remote_uri = "https://github.com/myuser/my-repo.git"
+}
+
+resource "google_cloudbuild_trigger" "repo-trigger" {
+  provider = google-beta
+  location = "us-central1"
+
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.my-repository.id
+    push {
+      branch = "feature-.*"
+    }
+  }
+
+  filename = "cloudbuild.yaml"
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=cloudbuild_trigger_bitbucket_server_push&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Cloudbuild Trigger Bitbucket Server Push
+
+
+```hcl
+resource "google_cloudbuild_trigger" "bbs-push-trigger" {
+  name        = "terraform-bbs-push-trigger"
+  location    = "us-central1"
+
+  bitbucket_server_trigger_config {
+    repo_slug = "terraform-provider-google"
+    project_key = "STAG"
+    bitbucket_server_config_resource = "projects/123456789/locations/us-central1/bitbucketServerConfigs/myBitbucketConfig"
+    push {
+        tag = "^0.1.*"
+        invert_regex = true
+    }
+  }
+
+  filename = "cloudbuild.yaml"
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=cloudbuild_trigger_bitbucket_server_pull_request&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Cloudbuild Trigger Bitbucket Server Pull Request
+
+
+```hcl
+resource "google_cloudbuild_trigger" "bbs-pull-request-trigger" {
+  name        = "terraform-bbs-pull-request-trigger"
+  location    = "us-central1"
+
+  bitbucket_server_trigger_config {
+    repo_slug = "terraform-provider-google"
+    project_key = "STAG"
+    bitbucket_server_config_resource = "projects/123456789/locations/us-central1/bitbucketServerConfigs/myBitbucketConfig"
+    pull_request {
+        branch = "^master$"
+        invert_regex = false
+        comment_control = "COMMENTS_ENABLED"
+    }
+  }
+
+  filename = "cloudbuild.yaml"
+}
+```
+## Example Usage - Cloudbuild Trigger Github Enterprise
+
+
+```hcl
+resource "google_cloudbuild_trigger" "ghe-trigger" {
+  name        = "terraform-ghe-trigger"
+  location    = "us-central1"
+
+  github {
+    owner = "hashicorp"
+    name  = "terraform-provider-google"
+    push {
+      branch = "^main$"
+    }
+    enterprise_config_resource_name = "projects/123456789/locations/us-central1/githubEnterpriseConfigs/configID"
+  }
+
+  filename = "cloudbuild.yaml"
+}
+```
 
 ## Argument Reference
 
@@ -412,7 +527,7 @@ The following arguments are supported:
   Build logs will be sent back to GitHub as part of the checkrun
   result.  Values can be INCLUDE_BUILD_LOGS_UNSPECIFIED or
   INCLUDE_BUILD_LOGS_WITH_STATUS
-  Possible values are `INCLUDE_BUILD_LOGS_UNSPECIFIED` and `INCLUDE_BUILD_LOGS_WITH_STATUS`.
+  Possible values are: `INCLUDE_BUILD_LOGS_UNSPECIFIED`, `INCLUDE_BUILD_LOGS_WITH_STATUS`.
 
 * `filename` -
   (Optional)
@@ -428,6 +543,11 @@ The following arguments are supported:
   (Optional)
   The file source describing the local or remote Build template.
   Structure is [documented below](#nested_git_file_source).
+
+* `repository_event_config` -
+  (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
+  The configuration of a trigger that creates a build whenever an event from Repo API is received.
+  Structure is [documented below](#nested_repository_event_config).
 
 * `source_to_build` -
   (Optional)
@@ -474,6 +594,11 @@ The following arguments are supported:
   Describes the configuration of a trigger that creates a build whenever a GitHub event is received.
   One of `trigger_template`, `github`, `pubsub_config` or `webhook_config` must be provided.
   Structure is [documented below](#nested_github).
+
+* `bitbucket_server_trigger_config` -
+  (Optional)
+  BitbucketServerTriggerConfig describes the configuration of a trigger that creates a build whenever a Bitbucket Server event is received.
+  Structure is [documented below](#nested_bitbucket_server_trigger_config).
 
 * `pubsub_config` -
   (Optional)
@@ -525,7 +650,7 @@ The following arguments are supported:
   (Required)
   The type of the repo, since it may not be explicit from the repo field (e.g from a URL). 
   Values can be UNKNOWN, CLOUD_SOURCE_REPOSITORIES, GITHUB, BITBUCKET_SERVER
-  Possible values are `UNKNOWN`, `CLOUD_SOURCE_REPOSITORIES`, `GITHUB`, and `BITBUCKET_SERVER`.
+  Possible values are: `UNKNOWN`, `CLOUD_SOURCE_REPOSITORIES`, `GITHUB`, `BITBUCKET_SERVER`.
 
 * `revision` -
   (Optional)
@@ -537,6 +662,58 @@ The following arguments are supported:
   (Optional)
   The full resource name of the github enterprise config.
   Format: projects/{project}/locations/{location}/githubEnterpriseConfigs/{id}. projects/{project}/githubEnterpriseConfigs/{id}.
+
+<a name="nested_repository_event_config"></a>The `repository_event_config` block supports:
+
+* `repository` -
+  (Optional)
+  The resource name of the Repo API resource.
+
+* `pull_request` -
+  (Optional)
+  Contains filter properties for matching Pull Requests.
+  Structure is [documented below](#nested_pull_request).
+
+* `push` -
+  (Optional)
+  Contains filter properties for matching git pushes.
+  Structure is [documented below](#nested_push).
+
+
+<a name="nested_pull_request"></a>The `pull_request` block supports:
+
+* `branch` -
+  (Optional)
+  Regex of branches to match.
+  The syntax of the regular expressions accepted is the syntax accepted by
+  RE2 and described at https://github.com/google/re2/wiki/Syntax
+
+* `invert_regex` -
+  (Optional)
+  If true, branches that do NOT match the git_ref will trigger a build.
+
+* `comment_control` -
+  (Optional)
+  Configure builds to run whether a repository owner or collaborator need to comment `/gcbrun`.
+  Possible values are: `COMMENTS_DISABLED`, `COMMENTS_ENABLED`, `COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY`.
+
+<a name="nested_push"></a>The `push` block supports:
+
+* `branch` -
+  (Optional)
+  Regex of branches to match.
+  The syntax of the regular expressions accepted is the syntax accepted by
+  RE2 and described at https://github.com/google/re2/wiki/Syntax
+
+* `tag` -
+  (Optional)
+  Regex of tags to match.
+  The syntax of the regular expressions accepted is the syntax accepted by
+  RE2 and described at https://github.com/google/re2/wiki/Syntax
+
+* `invert_regex` -
+  (Optional)
+  If true, only trigger a build if the revision regex does NOT match the git_ref regex.
 
 <a name="nested_source_to_build"></a>The `source_to_build` block supports:
 
@@ -552,7 +729,7 @@ The following arguments are supported:
   (Required)
   The type of the repo, since it may not be explicit from the repo field (e.g from a URL).
   Values can be UNKNOWN, CLOUD_SOURCE_REPOSITORIES, GITHUB, BITBUCKET_SERVER
-  Possible values are `UNKNOWN`, `CLOUD_SOURCE_REPOSITORIES`, `GITHUB`, and `BITBUCKET_SERVER`.
+  Possible values are: `UNKNOWN`, `CLOUD_SOURCE_REPOSITORIES`, `GITHUB`, `BITBUCKET_SERVER`.
 
 * `github_enterprise_config` -
   (Optional)
@@ -617,6 +794,11 @@ The following arguments are supported:
   filter to match changes in refs, like branches or tags. Specify only one of `pull_request` or `push`.
   Structure is [documented below](#nested_push).
 
+* `enterprise_config_resource_name` -
+  (Optional)
+  The resource name of the github enterprise config that should be applied to this installation.
+  For example: "projects/{$projectId}/locations/{$locationId}/githubEnterpriseConfigs/{$configId}"
+
 
 <a name="nested_pull_request"></a>The `pull_request` block supports:
 
@@ -627,7 +809,7 @@ The following arguments are supported:
 * `comment_control` -
   (Optional)
   Whether to block builds on a "/gcbrun" comment from a repository owner or collaborator.
-  Possible values are `COMMENTS_DISABLED`, `COMMENTS_ENABLED`, and `COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY`.
+  Possible values are: `COMMENTS_DISABLED`, `COMMENTS_ENABLED`, `COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY`.
 
 * `invert_regex` -
   (Optional)
@@ -647,9 +829,66 @@ The following arguments are supported:
   (Optional)
   Regex of tags to match.  Specify only one of branch or tag.
 
+<a name="nested_bitbucket_server_trigger_config"></a>The `bitbucket_server_trigger_config` block supports:
+
+* `repo_slug` -
+  (Required)
+  Slug of the repository. A repository slug is a URL-friendly version of a repository name, automatically generated by Bitbucket for use in the URL.
+  For example, if the repository name is 'test repo', in the URL it would become 'test-repo' as in https://mybitbucket.server/projects/TEST/repos/test-repo.
+
+* `project_key` -
+  (Required)
+  Key of the project that the repo is in. For example: The key for https://mybitbucket.server/projects/TEST/repos/test-repo is "TEST".
+
+* `bitbucket_server_config_resource` -
+  (Required)
+  The Bitbucket server config resource that this trigger config maps to.
+
+* `pull_request` -
+  (Optional)
+  Filter to match changes in pull requests.
+  Structure is [documented below](#nested_pull_request).
+
+* `push` -
+  (Optional)
+  Filter to match changes in refs like branches, tags.
+  Structure is [documented below](#nested_push).
+
+
+<a name="nested_pull_request"></a>The `pull_request` block supports:
+
+* `branch` -
+  (Required)
+  Regex of branches to match.
+  The syntax of the regular expressions accepted is the syntax accepted by RE2 and described at https://github.com/google/re2/wiki/Syntax
+
+* `comment_control` -
+  (Optional)
+  Configure builds to run whether a repository owner or collaborator need to comment /gcbrun.
+  Possible values are: `COMMENTS_DISABLED`, `COMMENTS_ENABLED`, `COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY`.
+
+* `invert_regex` -
+  (Optional)
+  If true, branches that do NOT match the git_ref will trigger a build.
+
+<a name="nested_push"></a>The `push` block supports:
+
+* `invert_regex` -
+  (Optional)
+  When true, only trigger a build if the revision regex does NOT match the gitRef regex.
+
+* `branch` -
+  (Optional)
+  Regex of branches to match.  Specify only one of branch or tag.
+
+* `tag` -
+  (Optional)
+  Regex of tags to match.  Specify only one of branch or tag.
+
 <a name="nested_pubsub_config"></a>The `pubsub_config` block supports:
 
 * `subscription` -
+  (Output)
   Output only. Name of the subscription.
 
 * `topic` -
@@ -661,6 +900,7 @@ The following arguments are supported:
   Service account that will make the push request.
 
 * `state` -
+  (Output)
   Potential issues with the underlying Pub/Sub subscription configuration.
   Only populated on get requests.
 
@@ -671,6 +911,7 @@ The following arguments are supported:
   Resource name for the secret required as a URL parameter.
 
 * `state` -
+  (Output)
   Potential issues with the underlying Pub/Sub subscription configuration.
   Only populated on get requests.
 
@@ -998,6 +1239,7 @@ The following arguments are supported:
   Path globs used to match files in the build's workspace.
 
 * `timing` -
+  (Output)
   Output only. Stores timing information for pushing all artifact objects.
   Structure is [documented below](#nested_timing).
 
@@ -1021,17 +1263,17 @@ The following arguments are supported:
 * `source_provenance_hash` -
   (Optional)
   Requested hash for SourceProvenance.
-  Each value may be one of `NONE`, `SHA256`, and `MD5`.
+  Each value may be one of: `NONE`, `SHA256`, `MD5`.
 
 * `requested_verify_option` -
   (Optional)
   Requested verifiability options.
-  Possible values are `NOT_VERIFIED` and `VERIFIED`.
+  Possible values are: `NOT_VERIFIED`, `VERIFIED`.
 
 * `machine_type` -
   (Optional)
   Compute Engine machine type on which to run the build.
-  Possible values are `UNSPECIFIED`, `N1_HIGHCPU_8`, `N1_HIGHCPU_32`, `E2_HIGHCPU_8`, and `E2_HIGHCPU_32`.
+  Possible values are: `UNSPECIFIED`, `N1_HIGHCPU_8`, `N1_HIGHCPU_32`, `E2_HIGHCPU_8`, `E2_HIGHCPU_32`.
 
 * `disk_size_gb` -
   (Optional)
@@ -1046,7 +1288,7 @@ The following arguments are supported:
   Option to specify behavior when there is an error in the substitution checks.
   NOTE this is always set to ALLOW_LOOSE for triggered builds and cannot be overridden
   in the build configuration file.
-  Possible values are `MUST_MATCH` and `ALLOW_LOOSE`.
+  Possible values are: `MUST_MATCH`, `ALLOW_LOOSE`.
 
 * `dynamic_substitutions` -
   (Optional)
@@ -1056,7 +1298,7 @@ The following arguments are supported:
 * `log_streaming_option` -
   (Optional)
   Option to define build log streaming behavior to Google Cloud Storage.
-  Possible values are `STREAM_DEFAULT`, `STREAM_ON`, and `STREAM_OFF`.
+  Possible values are: `STREAM_DEFAULT`, `STREAM_ON`, `STREAM_OFF`.
 
 * `worker_pool` -
   (Optional)
@@ -1066,7 +1308,7 @@ The following arguments are supported:
 * `logging` -
   (Optional)
   Option to specify the logging mode, which determines if and where build logs are stored.
-  Possible values are `LOGGING_UNSPECIFIED`, `LEGACY`, `GCS_ONLY`, `STACKDRIVER_ONLY`, `CLOUD_LOGGING_ONLY`, and `NONE`.
+  Possible values are: `LOGGING_UNSPECIFIED`, `LEGACY`, `GCS_ONLY`, `STACKDRIVER_ONLY`, `CLOUD_LOGGING_ONLY`, `NONE`.
 
 * `env` -
   (Optional)
@@ -1122,7 +1364,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Firestore"
-page_title: "Google: google_firestore_index"
 description: |-
   Cloud Firestore indexes enable simple and complex queries against documents in a database.
 ---
@@ -32,9 +31,12 @@ To get more information about Index, see:
     * [Official Documentation](https://cloud.google.com/firestore/docs/query-data/indexing)
 
 ~> **Warning:** This resource creates a Firestore Index on a project that already has
-Firestore enabled. If you haven't already enabled it, you can create a
+a Firestore database. If you haven't already created it, you may
+create a `google_firestore_database` resource with `type` set to
+`"FIRESTORE_NATIVE"` and `location_id` set to your chosen location.
+If you wish to use App Engine, you may instead create a
 `google_app_engine_application` resource with `database_type` set to
-`"CLOUD_FIRESTORE"` to do so. Your Firestore location will be the same as
+`"CLOUD_FIRESTORE"`. Your Firestore location will be the same as
 the App Engine location specified.
 
 ## Example Usage - Firestore Index Basic
@@ -89,13 +91,13 @@ The following arguments are supported:
   (Optional)
   Indicates that this field supports ordering by the specified order or comparing using =, <, <=, >, >=.
   Only one of `order` and `arrayConfig` can be specified.
-  Possible values are `ASCENDING` and `DESCENDING`.
+  Possible values are: `ASCENDING`, `DESCENDING`.
 
 * `array_config` -
   (Optional)
   Indicates that this field supports operations on arrayValues. Only one of `order` and `arrayConfig` can
   be specified.
-  Possible values are `CONTAINS`.
+  Possible values are: `CONTAINS`.
 
 - - -
 
@@ -108,7 +110,7 @@ The following arguments are supported:
   (Optional)
   The scope at which a query is run.
   Default value is `COLLECTION`.
-  Possible values are `COLLECTION` and `COLLECTION_GROUP`.
+  Possible values are: `COLLECTION`, `COLLECTION_GROUP`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -128,7 +130,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

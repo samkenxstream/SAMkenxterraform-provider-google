@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceCloudRunV2Service() *schema.Resource {
+func ResourceCloudRunV2Service() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceCloudRunV2ServiceCreate,
 		Read:   resourceCloudRunV2ServiceRead,
@@ -139,6 +139,7 @@ func resourceCloudRunV2Service() *schema.Resource {
 									},
 									"liveness_probe": {
 										Type:        schema.TypeList,
+										Computed:    true,
 										Optional:    true,
 										Description: `Periodic probe of container liveness. Container will be restarted if the probe fails. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes`,
 										MaxItems:    1,
@@ -150,10 +151,33 @@ func resourceCloudRunV2Service() *schema.Resource {
 													Description: `Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.`,
 													Default:     3,
 												},
+												"grpc": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: `GRPC specifies an action involving a GRPC port.`,
+													MaxItems:    1,
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"port": {
+																Type:        schema.TypeInt,
+																Computed:    true,
+																Optional:    true,
+																Description: `Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.`,
+															},
+															"service": {
+																Type:     schema.TypeString,
+																Optional: true,
+																Description: `The name of the service to place in the gRPC HealthCheckRequest
+(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+If this is not specified, the default behavior is defined by gRPC.`,
+															},
+														},
+													},
+												},
 												"http_get": {
 													Type:        schema.TypeList,
 													Optional:    true,
-													Description: `HTTPGet specifies the http request to perform. Exactly one of HTTPGet or TCPSocket must be specified.`,
+													Description: `HTTPGet specifies the http request to perform.`,
 													MaxItems:    1,
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
@@ -201,7 +225,8 @@ func resourceCloudRunV2Service() *schema.Resource {
 												"tcp_socket": {
 													Type:        schema.TypeList,
 													Optional:    true,
-													Description: `TCPSocket specifies an action involving a TCP port. Exactly one of HTTPGet or TCPSocket must be specified.`,
+													Deprecated:  "Cloud Run does not support tcp socket in liveness probe and `liveness_probe.tcp_socket` field will be removed in a future major release.",
+													Description: `TCPSocket specifies an action involving a TCP port. This field is not supported in liveness probe currently.`,
 													MaxItems:    1,
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
@@ -286,6 +311,29 @@ If omitted, a port number will be chosen and passed to the container through the
 													Optional:    true,
 													Description: `Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.`,
 													Default:     3,
+												},
+												"grpc": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: `GRPC specifies an action involving a GRPC port.`,
+													MaxItems:    1,
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"port": {
+																Type:        schema.TypeInt,
+																Computed:    true,
+																Optional:    true,
+																Description: `Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.`,
+															},
+															"service": {
+																Type:     schema.TypeString,
+																Optional: true,
+																Description: `The name of the service to place in the gRPC HealthCheckRequest
+(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+If this is not specified, the default behavior is defined by gRPC.`,
+															},
+														},
+													},
 												},
 												"http_get": {
 													Type:        schema.TypeList,
@@ -842,7 +890,7 @@ If reconciliation failed, trafficStatuses, observedGeneration, and latestReadyRe
 
 func resourceCloudRunV2ServiceCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -928,7 +976,7 @@ func resourceCloudRunV2ServiceCreate(d *schema.ResourceData, meta interface{}) e
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
+	res, err := SendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
 	if err != nil {
 		return fmt.Errorf("Error creating Service: %s", err)
 	}
@@ -943,7 +991,7 @@ func resourceCloudRunV2ServiceCreate(d *schema.ResourceData, meta interface{}) e
 	// Use the resource in the operation response to populate
 	// identity fields and d.Id() before read
 	var opRes map[string]interface{}
-	err = cloudRunV2OperationWaitTimeWithResponse(
+	err = CloudRunV2OperationWaitTimeWithResponse(
 		config, res, &opRes, project, "Creating Service", userAgent,
 		d.Timeout(schema.TimeoutCreate))
 	if err != nil {
@@ -967,7 +1015,7 @@ func resourceCloudRunV2ServiceCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceCloudRunV2ServiceRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -990,7 +1038,7 @@ func resourceCloudRunV2ServiceRead(d *schema.ResourceData, meta interface{}) err
 		billingProject = bp
 	}
 
-	res, err := sendRequest(config, "GET", billingProject, url, userAgent, nil)
+	res, err := SendRequest(config, "GET", billingProject, url, userAgent, nil)
 	if err != nil {
 		return handleNotFoundError(err, d, fmt.Sprintf("CloudRunV2Service %q", d.Id()))
 	}
@@ -1068,7 +1116,7 @@ func resourceCloudRunV2ServiceRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceCloudRunV2ServiceUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -1155,7 +1203,7 @@ func resourceCloudRunV2ServiceUpdate(d *schema.ResourceData, meta interface{}) e
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "PATCH", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
+	res, err := SendRequestWithTimeout(config, "PATCH", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
 
 	if err != nil {
 		return fmt.Errorf("Error updating Service %q: %s", d.Id(), err)
@@ -1163,7 +1211,7 @@ func resourceCloudRunV2ServiceUpdate(d *schema.ResourceData, meta interface{}) e
 		log.Printf("[DEBUG] Finished updating Service %q: %#v", d.Id(), res)
 	}
 
-	err = cloudRunV2OperationWaitTime(
+	err = CloudRunV2OperationWaitTime(
 		config, res, project, "Updating Service", userAgent,
 		d.Timeout(schema.TimeoutUpdate))
 
@@ -1176,7 +1224,7 @@ func resourceCloudRunV2ServiceUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceCloudRunV2ServiceDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -1202,12 +1250,12 @@ func resourceCloudRunV2ServiceDelete(d *schema.ResourceData, meta interface{}) e
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
+	res, err := SendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
 	if err != nil {
 		return handleNotFoundError(err, d, "Service")
 	}
 
-	err = cloudRunV2OperationWaitTime(
+	err = CloudRunV2OperationWaitTime(
 		config, res, project, "Deleting Service", userAgent,
 		d.Timeout(schema.TimeoutDelete))
 
@@ -1316,7 +1364,7 @@ func flattenCloudRunV2ServiceTemplate(v interface{}, d *schema.ResourceData, con
 	transformed["scaling"] =
 		flattenCloudRunV2ServiceTemplateScaling(original["scaling"], d, config)
 	transformed["vpc_access"] =
-		flattenCloudRunV2ServiceTemplateVPCAccess(original["vpcAccess"], d, config)
+		flattenCloudRunV2ServiceTemplateVpcAccess(original["vpcAccess"], d, config)
 	transformed["timeout"] =
 		flattenCloudRunV2ServiceTemplateTimeout(original["timeout"], d, config)
 	transformed["service_account"] =
@@ -1363,7 +1411,7 @@ func flattenCloudRunV2ServiceTemplateScaling(v interface{}, d *schema.ResourceDa
 func flattenCloudRunV2ServiceTemplateScalingMinInstanceCount(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1380,7 +1428,7 @@ func flattenCloudRunV2ServiceTemplateScalingMinInstanceCount(v interface{}, d *s
 func flattenCloudRunV2ServiceTemplateScalingMaxInstanceCount(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1394,7 +1442,7 @@ func flattenCloudRunV2ServiceTemplateScalingMaxInstanceCount(v interface{}, d *s
 	return v // let terraform core handle it otherwise
 }
 
-func flattenCloudRunV2ServiceTemplateVPCAccess(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenCloudRunV2ServiceTemplateVpcAccess(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	if v == nil {
 		return nil
 	}
@@ -1404,16 +1452,16 @@ func flattenCloudRunV2ServiceTemplateVPCAccess(v interface{}, d *schema.Resource
 	}
 	transformed := make(map[string]interface{})
 	transformed["connector"] =
-		flattenCloudRunV2ServiceTemplateVPCAccessConnector(original["connector"], d, config)
+		flattenCloudRunV2ServiceTemplateVpcAccessConnector(original["connector"], d, config)
 	transformed["egress"] =
-		flattenCloudRunV2ServiceTemplateVPCAccessEgress(original["egress"], d, config)
+		flattenCloudRunV2ServiceTemplateVpcAccessEgress(original["egress"], d, config)
 	return []interface{}{transformed}
 }
-func flattenCloudRunV2ServiceTemplateVPCAccessConnector(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenCloudRunV2ServiceTemplateVpcAccessConnector(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return v
 }
 
-func flattenCloudRunV2ServiceTemplateVPCAccessEgress(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+func flattenCloudRunV2ServiceTemplateVpcAccessEgress(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return v
 }
 
@@ -1582,7 +1630,7 @@ func flattenCloudRunV2ServiceTemplateContainersPortsName(v interface{}, d *schem
 func flattenCloudRunV2ServiceTemplateContainersPortsContainerPort(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1648,12 +1696,14 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbe(v interface{}, d *s
 		flattenCloudRunV2ServiceTemplateContainersLivenessProbeHttpGet(original["httpGet"], d, config)
 	transformed["tcp_socket"] =
 		flattenCloudRunV2ServiceTemplateContainersLivenessProbeTcpSocket(original["tcpSocket"], d, config)
+	transformed["grpc"] =
+		flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpc(original["grpc"], d, config)
 	return []interface{}{transformed}
 }
 func flattenCloudRunV2ServiceTemplateContainersLivenessProbeInitialDelaySeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1670,7 +1720,7 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbeInitialDelaySeconds(
 func flattenCloudRunV2ServiceTemplateContainersLivenessProbeTimeoutSeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1687,7 +1737,7 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbeTimeoutSeconds(v int
 func flattenCloudRunV2ServiceTemplateContainersLivenessProbePeriodSeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1704,7 +1754,7 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbePeriodSeconds(v inte
 func flattenCloudRunV2ServiceTemplateContainersLivenessProbeFailureThreshold(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1774,7 +1824,7 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbeTcpSocket(v interfac
 func flattenCloudRunV2ServiceTemplateContainersLivenessProbeTcpSocketPort(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1786,6 +1836,39 @@ func flattenCloudRunV2ServiceTemplateContainersLivenessProbeTcpSocketPort(v inte
 	}
 
 	return v // let terraform core handle it otherwise
+}
+
+func flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpc(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	transformed := make(map[string]interface{})
+	transformed["port"] =
+		flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpcPort(original["port"], d, config)
+	transformed["service"] =
+		flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpcService(original["service"], d, config)
+	return []interface{}{transformed}
+}
+func flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpcPort(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	// Handles the string fixed64 format
+	if strVal, ok := v.(string); ok {
+		if intVal, err := StringToFixed64(strVal); err == nil {
+			return intVal
+		}
+	}
+
+	// number values are represented as float64
+	if floatVal, ok := v.(float64); ok {
+		intVal := int(floatVal)
+		return intVal
+	}
+
+	return v // let terraform core handle it otherwise
+}
+
+func flattenCloudRunV2ServiceTemplateContainersLivenessProbeGrpcService(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
 }
 
 func flattenCloudRunV2ServiceTemplateContainersStartupProbe(v interface{}, d *schema.ResourceData, config *Config) interface{} {
@@ -1809,12 +1892,14 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbe(v interface{}, d *sc
 		flattenCloudRunV2ServiceTemplateContainersStartupProbeHttpGet(original["httpGet"], d, config)
 	transformed["tcp_socket"] =
 		flattenCloudRunV2ServiceTemplateContainersStartupProbeTcpSocket(original["tcpSocket"], d, config)
+	transformed["grpc"] =
+		flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpc(original["grpc"], d, config)
 	return []interface{}{transformed}
 }
 func flattenCloudRunV2ServiceTemplateContainersStartupProbeInitialDelaySeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1831,7 +1916,7 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbeInitialDelaySeconds(v
 func flattenCloudRunV2ServiceTemplateContainersStartupProbeTimeoutSeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1848,7 +1933,7 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbeTimeoutSeconds(v inte
 func flattenCloudRunV2ServiceTemplateContainersStartupProbePeriodSeconds(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1865,7 +1950,7 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbePeriodSeconds(v inter
 func flattenCloudRunV2ServiceTemplateContainersStartupProbeFailureThreshold(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1935,7 +2020,7 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbeTcpSocket(v interface
 func flattenCloudRunV2ServiceTemplateContainersStartupProbeTcpSocketPort(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -1947,6 +2032,39 @@ func flattenCloudRunV2ServiceTemplateContainersStartupProbeTcpSocketPort(v inter
 	}
 
 	return v // let terraform core handle it otherwise
+}
+
+func flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpc(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	if v == nil {
+		return nil
+	}
+	original := v.(map[string]interface{})
+	transformed := make(map[string]interface{})
+	transformed["port"] =
+		flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpcPort(original["port"], d, config)
+	transformed["service"] =
+		flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpcService(original["service"], d, config)
+	return []interface{}{transformed}
+}
+func flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpcPort(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	// Handles the string fixed64 format
+	if strVal, ok := v.(string); ok {
+		if intVal, err := StringToFixed64(strVal); err == nil {
+			return intVal
+		}
+	}
+
+	// number values are represented as float64
+	if floatVal, ok := v.(float64); ok {
+		intVal := int(floatVal)
+		return intVal
+	}
+
+	return v // let terraform core handle it otherwise
+}
+
+func flattenCloudRunV2ServiceTemplateContainersStartupProbeGrpcService(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
 }
 
 func flattenCloudRunV2ServiceTemplateVolumes(v interface{}, d *schema.ResourceData, config *Config) interface{} {
@@ -1997,7 +2115,7 @@ func flattenCloudRunV2ServiceTemplateVolumesSecretSecret(v interface{}, d *schem
 func flattenCloudRunV2ServiceTemplateVolumesSecretDefaultMode(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -2042,7 +2160,7 @@ func flattenCloudRunV2ServiceTemplateVolumesSecretItemsVersion(v interface{}, d 
 func flattenCloudRunV2ServiceTemplateVolumesSecretItemsMode(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -2084,7 +2202,7 @@ func flattenCloudRunV2ServiceTemplateEncryptionKey(v interface{}, d *schema.Reso
 func flattenCloudRunV2ServiceTemplateMaxInstanceRequestConcurrency(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -2130,7 +2248,7 @@ func flattenCloudRunV2ServiceTrafficRevision(v interface{}, d *schema.ResourceDa
 func flattenCloudRunV2ServiceTrafficPercent(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -2309,7 +2427,7 @@ func flattenCloudRunV2ServiceTrafficStatusesRevision(v interface{}, d *schema.Re
 func flattenCloudRunV2ServiceTrafficStatusesPercent(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -2456,11 +2574,11 @@ func expandCloudRunV2ServiceTemplate(v interface{}, d TerraformResourceData, con
 		transformed["scaling"] = transformedScaling
 	}
 
-	transformedVPCAccess, err := expandCloudRunV2ServiceTemplateVPCAccess(original["vpc_access"], d, config)
+	transformedVpcAccess, err := expandCloudRunV2ServiceTemplateVpcAccess(original["vpc_access"], d, config)
 	if err != nil {
 		return nil, err
-	} else if val := reflect.ValueOf(transformedVPCAccess); val.IsValid() && !isEmptyValue(val) {
-		transformed["vpcAccess"] = transformedVPCAccess
+	} else if val := reflect.ValueOf(transformedVpcAccess); val.IsValid() && !isEmptyValue(val) {
+		transformed["vpcAccess"] = transformedVpcAccess
 	}
 
 	transformedTimeout, err := expandCloudRunV2ServiceTemplateTimeout(original["timeout"], d, config)
@@ -2575,7 +2693,7 @@ func expandCloudRunV2ServiceTemplateScalingMaxInstanceCount(v interface{}, d Ter
 	return v, nil
 }
 
-func expandCloudRunV2ServiceTemplateVPCAccess(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandCloudRunV2ServiceTemplateVpcAccess(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	l := v.([]interface{})
 	if len(l) == 0 || l[0] == nil {
 		return nil, nil
@@ -2584,14 +2702,14 @@ func expandCloudRunV2ServiceTemplateVPCAccess(v interface{}, d TerraformResource
 	original := raw.(map[string]interface{})
 	transformed := make(map[string]interface{})
 
-	transformedConnector, err := expandCloudRunV2ServiceTemplateVPCAccessConnector(original["connector"], d, config)
+	transformedConnector, err := expandCloudRunV2ServiceTemplateVpcAccessConnector(original["connector"], d, config)
 	if err != nil {
 		return nil, err
 	} else if val := reflect.ValueOf(transformedConnector); val.IsValid() && !isEmptyValue(val) {
 		transformed["connector"] = transformedConnector
 	}
 
-	transformedEgress, err := expandCloudRunV2ServiceTemplateVPCAccessEgress(original["egress"], d, config)
+	transformedEgress, err := expandCloudRunV2ServiceTemplateVpcAccessEgress(original["egress"], d, config)
 	if err != nil {
 		return nil, err
 	} else if val := reflect.ValueOf(transformedEgress); val.IsValid() && !isEmptyValue(val) {
@@ -2601,11 +2719,11 @@ func expandCloudRunV2ServiceTemplateVPCAccess(v interface{}, d TerraformResource
 	return transformed, nil
 }
 
-func expandCloudRunV2ServiceTemplateVPCAccessConnector(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandCloudRunV2ServiceTemplateVpcAccessConnector(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
-func expandCloudRunV2ServiceTemplateVPCAccessEgress(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+func expandCloudRunV2ServiceTemplateVpcAccessEgress(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -2992,6 +3110,13 @@ func expandCloudRunV2ServiceTemplateContainersLivenessProbe(v interface{}, d Ter
 		transformed["tcpSocket"] = transformedTcpSocket
 	}
 
+	transformedGrpc, err := expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpc(original["grpc"], d, config)
+	if err != nil {
+		return nil, err
+	} else {
+		transformed["grpc"] = transformedGrpc
+	}
+
 	return transformed, nil
 }
 
@@ -3111,6 +3236,45 @@ func expandCloudRunV2ServiceTemplateContainersLivenessProbeTcpSocketPort(v inter
 	return v, nil
 }
 
+func expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpc(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 {
+		return nil, nil
+	}
+
+	if l[0] == nil {
+		transformed := make(map[string]interface{})
+		return transformed, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPort, err := expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpcPort(original["port"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPort); val.IsValid() && !isEmptyValue(val) {
+		transformed["port"] = transformedPort
+	}
+
+	transformedService, err := expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpcService(original["service"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedService); val.IsValid() && !isEmptyValue(val) {
+		transformed["service"] = transformedService
+	}
+
+	return transformed, nil
+}
+
+func expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpcPort(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandCloudRunV2ServiceTemplateContainersLivenessProbeGrpcService(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
 func expandCloudRunV2ServiceTemplateContainersStartupProbe(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	l := v.([]interface{})
 	if len(l) == 0 || l[0] == nil {
@@ -3160,6 +3324,13 @@ func expandCloudRunV2ServiceTemplateContainersStartupProbe(v interface{}, d Terr
 		return nil, err
 	} else {
 		transformed["tcpSocket"] = transformedTcpSocket
+	}
+
+	transformedGrpc, err := expandCloudRunV2ServiceTemplateContainersStartupProbeGrpc(original["grpc"], d, config)
+	if err != nil {
+		return nil, err
+	} else {
+		transformed["grpc"] = transformedGrpc
 	}
 
 	return transformed, nil
@@ -3278,6 +3449,45 @@ func expandCloudRunV2ServiceTemplateContainersStartupProbeTcpSocket(v interface{
 }
 
 func expandCloudRunV2ServiceTemplateContainersStartupProbeTcpSocketPort(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandCloudRunV2ServiceTemplateContainersStartupProbeGrpc(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 {
+		return nil, nil
+	}
+
+	if l[0] == nil {
+		transformed := make(map[string]interface{})
+		return transformed, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedPort, err := expandCloudRunV2ServiceTemplateContainersStartupProbeGrpcPort(original["port"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPort); val.IsValid() && !isEmptyValue(val) {
+		transformed["port"] = transformedPort
+	}
+
+	transformedService, err := expandCloudRunV2ServiceTemplateContainersStartupProbeGrpcService(original["service"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedService); val.IsValid() && !isEmptyValue(val) {
+		transformed["service"] = transformedService
+	}
+
+	return transformed, nil
+}
+
+func expandCloudRunV2ServiceTemplateContainersStartupProbeGrpcPort(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandCloudRunV2ServiceTemplateContainersStartupProbeGrpcService(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 

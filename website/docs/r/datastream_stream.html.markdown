@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Datastream"
-page_title: "Google: google_datastream_stream"
 description: |-
   A resource representing streaming data from a source to a destination.
 ---
@@ -133,6 +132,12 @@ resource "google_storage_bucket_iam_member" "reader" {
     member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-datastream.iam.gserviceaccount.com"
 }
 
+resource "google_kms_crypto_key_iam_member" "key_user" {
+    crypto_key_id = "kms-name"
+    role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+    member        = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-datastream.iam.gserviceaccount.com"
+}
+
 resource "google_datastream_connection_profile" "destination_connection_profile" {
     display_name          = "Connection profile"
     location              = "us-central1"
@@ -145,6 +150,9 @@ resource "google_datastream_connection_profile" "destination_connection_profile"
 }
 
 resource "google_datastream_stream" "default" {
+    depends_on = [
+        google_kms_crypto_key_iam_member.key_user
+    ]
     stream_id = "my-stream"
     desired_state = "NOT_STARTED"
     location = "us-central1"
@@ -195,7 +203,7 @@ resource "google_datastream_stream" "default" {
         gcs_destination_config {
             path = "mydata"
             file_rotation_mb = 200
-            file_rotation_interval = "900s"
+            file_rotation_interval = "60s"
             json_file_format {
                 schema_file_format = "NO_SCHEMA_FILE"
                 compression = "GZIP"
@@ -220,6 +228,428 @@ resource "google_datastream_stream" "default" {
                 }
             }
         }
+    }
+
+    customer_managed_encryption_key = "kms-name"
+}
+```
+## Example Usage - Datastream Stream Postgresql
+
+
+```hcl
+resource "google_datastream_connection_profile" "source" {
+    display_name          = "Postgresql Source"
+    location              = "us-central1"
+    connection_profile_id = "source-profile"
+
+    postgresql_profile {
+        hostname = "hostname"
+        port     = 3306
+        username = "user"
+        password = "pass"
+        database = "postgres"
+    }
+}
+
+resource "google_datastream_connection_profile" "destination" {
+    display_name          = "BigQuery Destination"
+    location              = "us-central1"
+    connection_profile_id = "destination-profile"
+
+    bigquery_profile {}
+}
+
+resource "google_datastream_stream" "default"  {
+    display_name = "Postgres to BigQuery"
+    location     = "us-central1"
+    stream_id    = "my-stream"
+    desired_state = "RUNNING"
+
+    source_config {
+        source_connection_profile = google_datastream_connection_profile.source.id
+        postgresql_source_config {
+            max_concurrent_backfill_tasks = 12
+            publication      = "publication"
+            replication_slot = "replication_slot"
+            include_objects {
+                postgresql_schemas {
+                    schema = "schema"
+                    postgresql_tables {
+                        table = "table"
+                        postgresql_columns {
+                            column = "column"
+                        }
+                    }
+                }
+            }
+            exclude_objects {
+                postgresql_schemas {
+                    schema = "schema"
+                    postgresql_tables {
+                        table = "table"
+                        postgresql_columns {
+                            column = "column"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    destination_config {
+        destination_connection_profile = google_datastream_connection_profile.destination.id
+        bigquery_destination_config {
+            data_freshness = "900s"
+            source_hierarchy_datasets {
+                dataset_template {
+                   location = "us-central1"
+                }
+            }
+        }
+    }
+
+    backfill_all {
+        postgresql_excluded_objects {
+            postgresql_schemas {
+                schema = "schema"
+                postgresql_tables {
+                    table = "table"
+                    postgresql_columns {
+                        column = "column"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+## Example Usage - Datastream Stream Oracle
+
+
+```hcl
+resource "google_datastream_connection_profile" "source" {
+    display_name          = "Oracle Source"
+    location              = "us-central1"
+    connection_profile_id = "source-profile"
+
+    oracle_profile {
+        hostname = "hostname"
+        port     = 1521
+        username = "user"
+        password = "pass"
+        database_service = "ORCL"
+    }
+}
+
+resource "google_datastream_connection_profile" "destination" {
+    display_name          = "BigQuery Destination"
+    location              = "us-central1"
+    connection_profile_id = "destination-profile"
+
+    bigquery_profile {}
+}
+
+resource "google_datastream_stream" "stream5" {
+    display_name = "Oracle to BigQuery"
+    location     = "us-central1"
+    stream_id    = "my-stream"
+    desired_state = "RUNNING"
+
+    source_config {
+        source_connection_profile = google_datastream_connection_profile.source.id
+        oracle_source_config {
+            max_concurrent_cdc_tasks = 8
+            max_concurrent_backfill_tasks = 12
+            include_objects {
+                oracle_schemas {
+                    schema = "schema"
+                    oracle_tables {
+                        table = "table"
+                        oracle_columns {
+                            column = "column"
+                        }
+                    }
+                }
+            }
+            exclude_objects {
+                oracle_schemas {
+                    schema = "schema"
+                    oracle_tables {
+                        table = "table"
+                        oracle_columns {
+                            column = "column"
+                        }
+                    }
+                }
+            }
+            drop_large_objects {}
+		    }
+    }
+
+    destination_config {
+        destination_connection_profile = google_datastream_connection_profile.destination.id
+        bigquery_destination_config {
+            data_freshness = "900s"
+            source_hierarchy_datasets {
+                dataset_template {
+                    location = "us-central1"
+                }
+            }
+        }
+    }
+
+    backfill_all {
+        oracle_excluded_objects {
+            oracle_schemas {
+                schema = "schema"
+                oracle_tables {
+                    table = "table"
+                    oracle_columns {
+                        column = "column"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=datastream_stream_postgresql_bigquery_dataset_id&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Datastream Stream Postgresql Bigquery Dataset Id
+
+
+```hcl
+
+resource "google_bigquery_dataset" "postgres" {
+  dataset_id    = "postgres%{random_suffix}"
+  friendly_name = "postgres"
+  description   = "Database of postgres"
+  location      = "us-central1"
+}
+
+resource "google_datastream_stream" "default" {
+  display_name  = "postgres to bigQuery"
+  location      = "us-central1"
+  stream_id     = "postgres-to-big-query%{random_suffix}"
+
+   source_config {
+    source_connection_profile = google_datastream_connection_profile.source_connection_profile.id
+    mysql_source_config {}
+  }
+
+  destination_config {
+    destination_connection_profile = google_datastream_connection_profile.destination_connection_profile2.id
+    bigquery_destination_config {
+      data_freshness = "900s"
+      single_target_dataset {
+        dataset_id = google_bigquery_dataset.postgres.id
+      }
+    }
+  }
+
+  backfill_all {
+  }
+
+}
+
+resource "google_datastream_connection_profile" "destination_connection_profile2" {
+    display_name          = "Connection profile"
+    location              = "us-central1"
+    connection_profile_id = "tf-test-destination-profile%{random_suffix}"
+    bigquery_profile {}
+}
+
+resource "google_sql_database_instance" "instance" {
+    name             = "tf-test-my-instance%{random_suffix}"
+    database_version = "MYSQL_8_0"
+    region           = "us-central1"
+    settings {
+        tier = "db-f1-micro"
+        backup_configuration {
+            enabled            = true
+            binary_log_enabled = true
+        }
+
+        ip_configuration {
+            // Datastream IPs will vary by region.
+            authorized_networks {
+                value = "34.71.242.81"
+            }
+
+            authorized_networks {
+                value = "34.72.28.29"
+            }
+
+            authorized_networks {
+                value = "34.67.6.157"
+            }
+
+            authorized_networks {
+                value = "34.67.234.134"
+            }
+
+            authorized_networks {
+                value = "34.72.239.218"
+            }
+        }
+    }
+
+    deletion_protection  = false
+}
+
+resource "google_sql_database" "db" {
+    instance = google_sql_database_instance.instance.name
+    name     = "db"
+}
+
+resource "random_password" "pwd" {
+    length = 16
+    special = false
+}
+
+resource "google_sql_user" "user" {
+    name     = "user%{random_suffix}"
+    instance = google_sql_database_instance.instance.name
+    host     = "%"
+    password = random_password.pwd.result
+}
+
+resource "google_datastream_connection_profile" "source_connection_profile" {
+    display_name          = "Source connection profile"
+    location              = "us-central1"
+    connection_profile_id = "tf-test-source-profile%{random_suffix}"
+
+    mysql_profile {
+        hostname = google_sql_database_instance.instance.public_ip_address
+        username = google_sql_user.user.name
+        password = google_sql_user.user.password
+    }
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=datastream_stream_bigquery&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Datastream Stream Bigquery
+
+
+```hcl
+data "google_project" "project" {
+}
+
+resource "google_sql_database_instance" "instance" {
+    name             = "my-instance"
+    database_version = "MYSQL_8_0"
+    region           = "us-central1"
+    settings {
+        tier = "db-f1-micro"
+        backup_configuration {
+            enabled            = true
+            binary_log_enabled = true
+        }
+
+        ip_configuration {
+
+            // Datastream IPs will vary by region.
+            authorized_networks {
+                value = "34.71.242.81"
+            }
+
+            authorized_networks {
+                value = "34.72.28.29"
+            }
+
+            authorized_networks {
+                value = "34.67.6.157"
+            }
+
+            authorized_networks {
+                value = "34.67.234.134"
+            }
+
+            authorized_networks {
+                value = "34.72.239.218"
+            }
+        }
+    }
+
+    deletion_protection  = true
+}
+
+resource "google_sql_database" "db" {
+    instance = google_sql_database_instance.instance.name
+    name     = "db"
+}
+
+resource "random_password" "pwd" {
+    length = 16
+    special = false
+}
+
+resource "google_sql_user" "user" {
+    name     = "user"
+    instance = google_sql_database_instance.instance.name
+    host     = "%"
+    password = random_password.pwd.result
+}
+
+resource "google_datastream_connection_profile" "source_connection_profile" {
+    display_name          = "Source connection profile"
+    location              = "us-central1"
+    connection_profile_id = "source-profile"
+
+    mysql_profile {
+        hostname = google_sql_database_instance.instance.public_ip_address
+        username = google_sql_user.user.name
+        password = google_sql_user.user.password
+    }
+}
+
+data "google_bigquery_default_service_account" "bq_sa" {
+}
+
+resource "google_kms_crypto_key_iam_member" "bigquery_key_user" {
+  crypto_key_id = "bigquery-kms-name"
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:${data.google_bigquery_default_service_account.bq_sa.email}"
+}
+
+resource "google_datastream_connection_profile" "destination_connection_profile" {
+    display_name          = "Connection profile"
+    location              = "us-central1"
+    connection_profile_id = "destination-profile"
+
+    bigquery_profile {}
+}
+
+resource "google_datastream_stream" "default" {
+    depends_on = [
+        google_kms_crypto_key_iam_member.bigquery_key_user
+    ]
+    stream_id = "my-stream"
+    location = "us-central1"
+    display_name = "my stream"
+    source_config {
+        source_connection_profile = google_datastream_connection_profile.source_connection_profile.id
+        mysql_source_config {}
+    }
+    destination_config {
+        destination_connection_profile = google_datastream_connection_profile.destination_connection_profile.id
+        bigquery_destination_config {
+            source_hierarchy_datasets {
+                dataset_template {
+                    location = "us-central1"
+                    kms_key_name = "bigquery-kms-name"
+                }
+            }
+        }
+    }
+
+    backfill_none {
     }
 }
 ```
@@ -259,9 +689,19 @@ The following arguments are supported:
   Source connection profile resource. Format: projects/{project}/locations/{location}/connectionProfiles/{name}
 
 * `mysql_source_config` -
-  (Required)
+  (Optional)
   MySQL data source configuration.
   Structure is [documented below](#nested_mysql_source_config).
+
+* `oracle_source_config` -
+  (Optional)
+  MySQL data source configuration.
+  Structure is [documented below](#nested_oracle_source_config).
+
+* `postgresql_source_config` -
+  (Optional)
+  PostgreSQL data source configuration.
+  Structure is [documented below](#nested_postgresql_source_config).
 
 
 <a name="nested_mysql_source_config"></a>The `mysql_source_config` block supports:
@@ -326,6 +766,7 @@ The following arguments are supported:
   https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 
 * `length` -
+  (Output)
   Column length.
 
 * `collation` -
@@ -388,11 +829,347 @@ The following arguments are supported:
   https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 
 * `length` -
+  (Output)
   Column length.
 
 * `collation` -
   (Optional)
   Column collation.
+
+* `primary_key` -
+  (Optional)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Optional)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Optional)
+  The ordinal position of the column in the table.
+
+<a name="nested_oracle_source_config"></a>The `oracle_source_config` block supports:
+
+* `include_objects` -
+  (Optional)
+  Oracle objects to retrieve from the source.
+  Structure is [documented below](#nested_include_objects).
+
+* `exclude_objects` -
+  (Optional)
+  Oracle objects to exclude from the stream.
+  Structure is [documented below](#nested_exclude_objects).
+
+* `max_concurrent_cdc_tasks` -
+  (Optional)
+  Maximum number of concurrent CDC tasks. The number should be non negative.
+  If not set (or set to 0), the system's default value will be used.
+
+* `max_concurrent_backfill_tasks` -
+  (Optional)
+  Maximum number of concurrent backfill tasks. The number should be non negative.
+  If not set (or set to 0), the system's default value will be used.
+
+* `drop_large_objects` -
+  (Optional)
+  Configuration to drop large object values.
+
+* `stream_large_objects` -
+  (Optional)
+  Configuration to drop large object values.
+
+
+<a name="nested_include_objects"></a>The `include_objects` block supports:
+
+* `oracle_schemas` -
+  (Required)
+  Oracle schemas/databases in the database server
+  Structure is [documented below](#nested_oracle_schemas).
+
+
+<a name="nested_oracle_schemas"></a>The `oracle_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Schema name.
+
+* `oracle_tables` -
+  (Optional)
+  Tables in the database.
+  Structure is [documented below](#nested_oracle_tables).
+
+
+<a name="nested_oracle_tables"></a>The `oracle_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `oracle_columns` -
+  (Optional)
+  Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_oracle_columns).
+
+
+<a name="nested_oracle_columns"></a>The `oracle_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The Oracle data type. Full data types list can be found here:
+  https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
+
+* `encoding` -
+  (Output)
+  Column encoding.
+
+* `primary_key` -
+  (Output)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Output)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Output)
+  The ordinal position of the column in the table.
+
+<a name="nested_exclude_objects"></a>The `exclude_objects` block supports:
+
+* `oracle_schemas` -
+  (Required)
+  Oracle schemas/databases in the database server
+  Structure is [documented below](#nested_oracle_schemas).
+
+
+<a name="nested_oracle_schemas"></a>The `oracle_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Schema name.
+
+* `oracle_tables` -
+  (Optional)
+  Tables in the database.
+  Structure is [documented below](#nested_oracle_tables).
+
+
+<a name="nested_oracle_tables"></a>The `oracle_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `oracle_columns` -
+  (Optional)
+  Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_oracle_columns).
+
+
+<a name="nested_oracle_columns"></a>The `oracle_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The Oracle data type. Full data types list can be found here:
+  https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
+
+* `encoding` -
+  (Output)
+  Column encoding.
+
+* `primary_key` -
+  (Output)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Output)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Output)
+  The ordinal position of the column in the table.
+
+<a name="nested_postgresql_source_config"></a>The `postgresql_source_config` block supports:
+
+* `include_objects` -
+  (Optional)
+  PostgreSQL objects to retrieve from the source.
+  Structure is [documented below](#nested_include_objects).
+
+* `exclude_objects` -
+  (Optional)
+  PostgreSQL objects to exclude from the stream.
+  Structure is [documented below](#nested_exclude_objects).
+
+* `replication_slot` -
+  (Required)
+  The name of the logical replication slot that's configured with
+  the pgoutput plugin.
+
+* `publication` -
+  (Required)
+  The name of the publication that includes the set of all tables
+  that are defined in the stream's include_objects.
+
+* `max_concurrent_backfill_tasks` -
+  (Optional)
+  Maximum number of concurrent backfill tasks. The number should be non
+  negative. If not set (or set to 0), the system's default value will be used.
+
+
+<a name="nested_include_objects"></a>The `include_objects` block supports:
+
+* `postgresql_schemas` -
+  (Required)
+  PostgreSQL schemas on the server
+  Structure is [documented below](#nested_postgresql_schemas).
+
+
+<a name="nested_postgresql_schemas"></a>The `postgresql_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Database name.
+
+* `postgresql_tables` -
+  (Optional)
+  Tables in the schema.
+  Structure is [documented below](#nested_postgresql_tables).
+
+
+<a name="nested_postgresql_tables"></a>The `postgresql_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `postgresql_columns` -
+  (Optional)
+  PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_postgresql_columns).
+
+
+<a name="nested_postgresql_columns"></a>The `postgresql_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The PostgreSQL data type. Full data types list can be found here:
+  https://www.postgresql.org/docs/current/datatype.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
+
+* `primary_key` -
+  (Optional)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Optional)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Optional)
+  The ordinal position of the column in the table.
+
+<a name="nested_exclude_objects"></a>The `exclude_objects` block supports:
+
+* `postgresql_schemas` -
+  (Required)
+  PostgreSQL schemas on the server
+  Structure is [documented below](#nested_postgresql_schemas).
+
+
+<a name="nested_postgresql_schemas"></a>The `postgresql_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Database name.
+
+* `postgresql_tables` -
+  (Optional)
+  Tables in the schema.
+  Structure is [documented below](#nested_postgresql_tables).
+
+
+<a name="nested_postgresql_tables"></a>The `postgresql_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `postgresql_columns` -
+  (Optional)
+  PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_postgresql_columns).
+
+
+<a name="nested_postgresql_columns"></a>The `postgresql_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The PostgreSQL data type. Full data types list can be found here:
+  https://www.postgresql.org/docs/current/datatype.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
 
 * `primary_key` -
   (Optional)
@@ -453,12 +1230,12 @@ The following arguments are supported:
 * `schema_file_format` -
   (Optional)
   The schema file format along JSON data files.
-  Possible values are `NO_SCHEMA_FILE` and `AVRO_SCHEMA_FILE`.
+  Possible values are: `NO_SCHEMA_FILE`, `AVRO_SCHEMA_FILE`.
 
 * `compression` -
   (Optional)
   Compression of the loaded JSON file.
-  Possible values are `NO_COMPRESSION` and `GZIP`.
+  Possible values are: `NO_COMPRESSION`, `GZIP`.
 
 <a name="nested_bigquery_destination_config"></a>The `bigquery_destination_config` block supports:
 
@@ -484,7 +1261,8 @@ The following arguments are supported:
 
 * `dataset_id` -
   (Required)
-  Dataset ID in the format projects/{project}/datasets/{dataset_id}
+  Dataset ID in the format projects/{project}/datasets/{dataset_id} or
+  {project}:{dataset_id}
 
 <a name="nested_source_hierarchy_datasets"></a>The `source_hierarchy_datasets` block supports:
 
@@ -506,6 +1284,13 @@ The following arguments are supported:
   If supplied, every created dataset will have its name prefixed by the provided value.
   The prefix and name will be separated by an underscore. i.e. _.
 
+* `kms_key_name` -
+  (Optional)
+  Describes the Cloud KMS encryption key that will be used to protect destination BigQuery
+  table. The BigQuery Service Account associated with your project requires access to this
+  encryption key. i.e. projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{cryptoKey}.
+  See https://cloud.google.com/bigquery/docs/customer-managed-encryption for more information.
+
 - - -
 
 
@@ -522,6 +1307,11 @@ The following arguments are supported:
   (Optional)
   Backfill strategy to disable automatic backfill for the Stream's objects.
 
+* `customer_managed_encryption_key` -
+  (Optional)
+  A reference to a KMS encryption key. If provided, it will be used to encrypt the data. If left blank, data
+  will be encrypted using an internal Stream-specific encryption key provisioned through KMS.
+
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
 
@@ -534,6 +1324,16 @@ The following arguments are supported:
   (Optional)
   MySQL data source objects to avoid backfilling.
   Structure is [documented below](#nested_mysql_excluded_objects).
+
+* `postgresql_excluded_objects` -
+  (Optional)
+  PostgreSQL data source objects to avoid backfilling.
+  Structure is [documented below](#nested_postgresql_excluded_objects).
+
+* `oracle_excluded_objects` -
+  (Optional)
+  PostgreSQL data source objects to avoid backfilling.
+  Structure is [documented below](#nested_oracle_excluded_objects).
 
 
 <a name="nested_mysql_excluded_objects"></a>The `mysql_excluded_objects` block supports:
@@ -580,6 +1380,7 @@ The following arguments are supported:
   https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 
 * `length` -
+  (Output)
   Column length.
 
 * `collation` -
@@ -598,6 +1399,144 @@ The following arguments are supported:
   (Optional)
   The ordinal position of the column in the table.
 
+<a name="nested_postgresql_excluded_objects"></a>The `postgresql_excluded_objects` block supports:
+
+* `postgresql_schemas` -
+  (Required)
+  PostgreSQL schemas on the server
+  Structure is [documented below](#nested_postgresql_schemas).
+
+
+<a name="nested_postgresql_schemas"></a>The `postgresql_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Database name.
+
+* `postgresql_tables` -
+  (Optional)
+  Tables in the schema.
+  Structure is [documented below](#nested_postgresql_tables).
+
+
+<a name="nested_postgresql_tables"></a>The `postgresql_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `postgresql_columns` -
+  (Optional)
+  PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_postgresql_columns).
+
+
+<a name="nested_postgresql_columns"></a>The `postgresql_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The PostgreSQL data type. Full data types list can be found here:
+  https://www.postgresql.org/docs/current/datatype.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
+
+* `primary_key` -
+  (Optional)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Optional)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Optional)
+  The ordinal position of the column in the table.
+
+<a name="nested_oracle_excluded_objects"></a>The `oracle_excluded_objects` block supports:
+
+* `oracle_schemas` -
+  (Required)
+  Oracle schemas/databases in the database server
+  Structure is [documented below](#nested_oracle_schemas).
+
+
+<a name="nested_oracle_schemas"></a>The `oracle_schemas` block supports:
+
+* `schema` -
+  (Required)
+  Schema name.
+
+* `oracle_tables` -
+  (Optional)
+  Tables in the database.
+  Structure is [documented below](#nested_oracle_tables).
+
+
+<a name="nested_oracle_tables"></a>The `oracle_tables` block supports:
+
+* `table` -
+  (Required)
+  Table name.
+
+* `oracle_columns` -
+  (Optional)
+  Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+  Structure is [documented below](#nested_oracle_columns).
+
+
+<a name="nested_oracle_columns"></a>The `oracle_columns` block supports:
+
+* `column` -
+  (Optional)
+  Column name.
+
+* `data_type` -
+  (Optional)
+  The Oracle data type. Full data types list can be found here:
+  https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html
+
+* `length` -
+  (Output)
+  Column length.
+
+* `precision` -
+  (Output)
+  Column precision.
+
+* `scale` -
+  (Output)
+  Column scale.
+
+* `encoding` -
+  (Output)
+  Column encoding.
+
+* `primary_key` -
+  (Output)
+  Whether or not the column represents a primary key.
+
+* `nullable` -
+  (Output)
+  Whether or not the column can accept a null value.
+
+* `ordinal_position` -
+  (Output)
+  The ordinal position of the column in the table.
+
 ## Attributes Reference
 
 In addition to the arguments listed above, the following computed attributes are exported:
@@ -614,7 +1553,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

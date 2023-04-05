@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Tasks"
-page_title: "Google: google_cloud_tasks_queue"
 description: |-
   A named resource to which messages are sent by publishers.
 ---
@@ -147,6 +146,7 @@ The following arguments are supported:
   By default, the task is sent to an instance which is available when the task is attempted.
 
 * `host` -
+  (Output)
   The host that the task is sent to.
 
 <a name="nested_rate_limits"></a>The `rate_limits` block supports:
@@ -164,6 +164,7 @@ The following arguments are supported:
   concurrent requests decreases.
 
 * `max_burst_size` -
+  (Output)
   The max burst size.
   Max burst size limits how fast tasks in queue are processed when many tasks are
   in the queue and the rate is high. This field allows the queue to have a high
@@ -228,7 +229,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

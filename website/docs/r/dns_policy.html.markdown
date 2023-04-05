@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud DNS"
-page_title: "Google: google_dns_policy"
 description: |-
   A policy is a collection of DNS rules applied to one or more Virtual
   Private Cloud resources.
@@ -141,7 +140,7 @@ The following arguments are supported:
   Forwarding path for this TargetNameServer. If unset or `default` Cloud DNS will make forwarding
   decision based on address ranges, i.e. RFC1918 addresses go to the VPC, Non-RFC1918 addresses go
   to the Internet. When set to `private`, Cloud DNS will always send queries through VPC for this target
-  Possible values are `default` and `private`.
+  Possible values are: `default`, `private`.
 
 <a name="nested_networks"></a>The `networks` block supports:
 
@@ -161,7 +160,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

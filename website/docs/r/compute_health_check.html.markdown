@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_health_check"
 description: |-
   Health Checks determine whether instances are responsive and able to do work.
 ---
@@ -468,7 +467,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to the
   backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `port_specification` -
   (Optional)
@@ -482,7 +481,7 @@ The following arguments are supported:
     checking.
   If not specified, HTTP health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 <a name="nested_https_health_check"></a>The `https_health_check` block supports:
 
@@ -518,7 +517,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to the
   backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `port_specification` -
   (Optional)
@@ -532,7 +531,7 @@ The following arguments are supported:
     checking.
   If not specified, HTTPS health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 <a name="nested_tcp_health_check"></a>The `tcp_health_check` block supports:
 
@@ -564,7 +563,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to the
   backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `port_specification` -
   (Optional)
@@ -578,7 +577,7 @@ The following arguments are supported:
     checking.
   If not specified, TCP health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 <a name="nested_ssl_health_check"></a>The `ssl_health_check` block supports:
 
@@ -610,7 +609,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to the
   backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `port_specification` -
   (Optional)
@@ -624,7 +623,7 @@ The following arguments are supported:
     checking.
   If not specified, SSL health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 <a name="nested_http2_health_check"></a>The `http2_health_check` block supports:
 
@@ -660,7 +659,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to the
   backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `port_specification` -
   (Optional)
@@ -674,7 +673,7 @@ The following arguments are supported:
     checking.
   If not specified, HTTP2 health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 <a name="nested_grpc_health_check"></a>The `grpc_health_check` block supports:
 
@@ -701,7 +700,7 @@ The following arguments are supported:
     checking.
   If not specified, gRPC health check follows behavior specified in `port` and
   `portName` fields.
-  Possible values are `USE_FIXED_PORT`, `USE_NAMED_PORT`, and `USE_SERVING_PORT`.
+  Possible values are: `USE_FIXED_PORT`, `USE_NAMED_PORT`, `USE_SERVING_PORT`.
 
 * `grpc_service_name` -
   (Optional)
@@ -735,7 +734,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

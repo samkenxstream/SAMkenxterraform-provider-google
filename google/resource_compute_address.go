@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceComputeAddress() *schema.Resource {
+func ResourceComputeAddress() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceComputeAddressCreate,
 		Read:   resourceComputeAddressRead,
@@ -66,8 +66,9 @@ if any. Set by the API if undefined.`,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateEnum([]string{"INTERNAL", "EXTERNAL", ""}),
-				Description:  `The type of address to reserve. Default value: "EXTERNAL" Possible values: ["INTERNAL", "EXTERNAL"]`,
-				Default:      "EXTERNAL",
+				Description: `The type of address to reserve.
+Note: if you set this argument's value as 'INTERNAL' you need to leave the 'network_tier' argument unset in that resource block. Default value: "EXTERNAL" Possible values: ["INTERNAL", "EXTERNAL"]`,
+				Default: "EXTERNAL",
 			},
 			"description": {
 				Type:        schema.TypeString,
@@ -91,7 +92,8 @@ IPSEC_INTERCONNECT purposes.`,
 				ForceNew:     true,
 				ValidateFunc: validateEnum([]string{"PREMIUM", "STANDARD", ""}),
 				Description: `The networking tier used for configuring this address. If this field is not
-specified, it is assumed to be PREMIUM. Possible values: ["PREMIUM", "STANDARD"]`,
+specified, it is assumed to be PREMIUM.
+This argument should not be used when configuring Internal addresses, because [network tier cannot be set for internal traffic; it's always Premium](https://cloud.google.com/network-tiers/docs/overview). Possible values: ["PREMIUM", "STANDARD"]`,
 			},
 			"prefix_length": {
 				Type:        schema.TypeInt,
@@ -104,23 +106,24 @@ specified, it is assumed to be PREMIUM. Possible values: ["PREMIUM", "STANDARD"]
 				Computed: true,
 				Optional: true,
 				ForceNew: true,
-				Description: `The purpose of this resource, which can be one of the following values:
+				Description: `The purpose of this resource, which can be one of the following values.
 
 * GCE_ENDPOINT for addresses that are used by VM instances, alias IP
-  ranges, internal load balancers, and similar resources.
+ranges, load balancers, and similar resources.
 
 * SHARED_LOADBALANCER_VIP for an address that can be used by multiple
-  internal load balancers.
+internal load balancers.
 
 * VPC_PEERING for addresses that are reserved for VPC peer networks.
 
-* IPSEC_INTERCONNECT for addresses created from a private IP range
-  that are reserved for a VLAN attachment in an IPsec-encrypted Cloud
-  Interconnect configuration. These addresses are regional resources.
+* IPSEC_INTERCONNECT for addresses created from a private IP range that
+are reserved for a VLAN attachment in an HA VPN over Cloud Interconnect
+configuration. These addresses are regional resources.
 
-* PRIVATE_SERVICE_CONNECT for a private network address that is used
-to configure Private Service Connect. Only global internal addresses
-can use this purpose.
+* PRIVATE_SERVICE_CONNECT for a private network address that is used to
+configure Private Service Connect. Only global internal addresses can use
+this purpose.
+
 
 This should only be set when using an Internal address.`,
 			},
@@ -174,7 +177,7 @@ GCE_ENDPOINT/DNS_RESOLVER purposes.`,
 
 func resourceComputeAddressCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -260,7 +263,7 @@ func resourceComputeAddressCreate(d *schema.ResourceData, meta interface{}) erro
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
+	res, err := SendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
 	if err != nil {
 		return fmt.Errorf("Error creating Address: %s", err)
 	}
@@ -272,7 +275,7 @@ func resourceComputeAddressCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 	d.SetId(id)
 
-	err = computeOperationWaitTime(
+	err = ComputeOperationWaitTime(
 		config, res, project, "Creating Address", userAgent,
 		d.Timeout(schema.TimeoutCreate))
 
@@ -289,7 +292,7 @@ func resourceComputeAddressCreate(d *schema.ResourceData, meta interface{}) erro
 
 func resourceComputeAddressRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -312,7 +315,7 @@ func resourceComputeAddressRead(d *schema.ResourceData, meta interface{}) error 
 		billingProject = bp
 	}
 
-	res, err := sendRequest(config, "GET", billingProject, url, userAgent, nil)
+	res, err := SendRequest(config, "GET", billingProject, url, userAgent, nil)
 	if err != nil {
 		return handleNotFoundError(err, d, fmt.Sprintf("ComputeAddress %q", d.Id()))
 	}
@@ -366,7 +369,7 @@ func resourceComputeAddressRead(d *schema.ResourceData, meta interface{}) error 
 
 func resourceComputeAddressDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -392,12 +395,12 @@ func resourceComputeAddressDelete(d *schema.ResourceData, meta interface{}) erro
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
+	res, err := SendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
 	if err != nil {
 		return handleNotFoundError(err, d, "Address")
 	}
 
-	err = computeOperationWaitTime(
+	err = ComputeOperationWaitTime(
 		config, res, project, "Deleting Address", userAgent,
 		d.Timeout(schema.TimeoutDelete))
 
@@ -483,7 +486,7 @@ func flattenComputeAddressNetwork(v interface{}, d *schema.ResourceData, config 
 func flattenComputeAddressPrefixLength(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}

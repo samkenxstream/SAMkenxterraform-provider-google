@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_region_ssl_policy"
 description: |-
   Represents a Regional SSL policy.
 ---
@@ -69,14 +68,14 @@ The following arguments are supported:
   for information on what cipher suites each profile provides. If
   `CUSTOM` is used, the `custom_features` attribute **must be set**.
   Default value is `COMPATIBLE`.
-  Possible values are `COMPATIBLE`, `MODERN`, `RESTRICTED`, and `CUSTOM`.
+  Possible values are: `COMPATIBLE`, `MODERN`, `RESTRICTED`, `CUSTOM`.
 
 * `min_tls_version` -
   (Optional)
   The minimum version of SSL protocol that can be used by the clients
   to establish a connection with the load balancer.
   Default value is `TLS_1_0`.
-  Possible values are `TLS_1_0`, `TLS_1_1`, and `TLS_1_2`.
+  Possible values are: `TLS_1_0`, `TLS_1_1`, `TLS_1_2`.
 
 * `custom_features` -
   (Optional)
@@ -113,7 +112,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

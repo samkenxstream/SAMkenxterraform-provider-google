@@ -121,7 +121,7 @@ var (
 	}
 )
 
-func resourceComposerEnvironment() *schema.Resource {
+func ResourceComposerEnvironment() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceComposerEnvironmentCreate,
 		Read:   resourceComposerEnvironmentRead,
@@ -260,7 +260,7 @@ func resourceComposerEnvironment() *schema.Resource {
 											Type: schema.TypeString,
 										},
 										Set:         schema.HashString,
-										Description: `The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with RFC1035. Cannot be updated. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.`,
+										Description: `The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with RFC1035. Cannot be updated.`,
 									},
 									"ip_allocation_policy": {
 										Type:        schema.TypeList,
@@ -786,7 +786,7 @@ func resourceComposerEnvironment() *schema.Resource {
 
 func resourceComposerEnvironmentCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -823,7 +823,7 @@ func resourceComposerEnvironmentCreate(d *schema.ResourceData, meta interface{})
 	}
 	d.SetId(id)
 
-	waitErr := composerOperationWaitTime(
+	waitErr := ComposerOperationWaitTime(
 		config, op, envName.Project, "Creating Environment", userAgent,
 		d.Timeout(schema.TimeoutCreate))
 
@@ -852,7 +852,7 @@ func resourceComposerEnvironmentCreate(d *schema.ResourceData, meta interface{})
 
 func resourceComposerEnvironmentRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -889,7 +889,7 @@ func resourceComposerEnvironmentRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceComposerEnvironmentUpdate(d *schema.ResourceData, meta interface{}) error {
 	tfConfig := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, tfConfig.userAgent)
+	userAgent, err := generateUserAgentString(d, tfConfig.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -1094,8 +1094,6 @@ func resourceComposerEnvironmentPostCreateUpdate(updateEnv *composer.Environment
 		return nil
 	}
 
-	d.Partial(true)
-
 	if updateEnv.Config != nil && updateEnv.Config.SoftwareConfig != nil && len(updateEnv.Config.SoftwareConfig.PypiPackages) > 0 {
 		log.Printf("[DEBUG] Running post-create update for Environment %q", d.Id())
 		err := resourceComposerEnvironmentPatchField("config.softwareConfig.pypiPackages", userAgent, updateEnv, d, cfg)
@@ -1105,7 +1103,7 @@ func resourceComposerEnvironmentPostCreateUpdate(updateEnv *composer.Environment
 
 		log.Printf("[DEBUG] Finish update to Environment %q post create for update only fields", d.Id())
 	}
-	d.Partial(false)
+
 	return resourceComposerEnvironmentRead(d, cfg)
 }
 
@@ -1124,7 +1122,7 @@ func resourceComposerEnvironmentPatchField(updateMask, userAgent string, env *co
 		return err
 	}
 
-	waitErr := composerOperationWaitTime(
+	waitErr := ComposerOperationWaitTime(
 		config, op, envName.Project, "Updating newly created Environment", userAgent,
 		d.Timeout(schema.TimeoutCreate))
 	if waitErr != nil {
@@ -1138,7 +1136,7 @@ func resourceComposerEnvironmentPatchField(updateMask, userAgent string, env *co
 
 func resourceComposerEnvironmentDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -1154,7 +1152,7 @@ func resourceComposerEnvironmentDelete(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	err = composerOperationWaitTime(
+	err = ComposerOperationWaitTime(
 		config, op, envName.Project, "Deleting Environment", userAgent,
 		d.Timeout(schema.TimeoutDelete))
 	if err != nil {
@@ -2038,7 +2036,7 @@ func validateComposerEnvironmentEnvVariables(v interface{}, k string) (ws []stri
 }
 
 func handleComposerEnvironmentCreationOpFailure(id string, envName *composerEnvironmentName, d *schema.ResourceData, config *Config) error {
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -2065,7 +2063,7 @@ func handleComposerEnvironmentCreationOpFailure(id string, envName *composerEnvi
 		return fmt.Errorf("Could not delete the invalid created environment with state %q: %s", env.State, err)
 	}
 
-	waitErr := composerOperationWaitTime(
+	waitErr := ComposerOperationWaitTime(
 		config, op, envName.Project,
 		fmt.Sprintf("Deleting invalid created Environment with state %q", env.State), userAgent,
 		d.Timeout(schema.TimeoutCreate))

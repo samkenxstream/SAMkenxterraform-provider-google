@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Data catalog"
-page_title: "Google: google_data_catalog_taxonomy"
 description: |-
   A collection of policy tags that classify data along a common axis.
 ---
@@ -22,12 +21,10 @@ description: |-
 
 A collection of policy tags that classify data along a common axis.
 
-~> **Warning:** This resource is in beta, and should be used with the terraform-provider-google-beta provider.
-See [Provider Versions](https://terraform.io/docs/providers/google/guides/provider_versions.html) for more details on beta resources.
 
 To get more information about Taxonomy, see:
 
-* [API documentation](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.taxonomies)
+* [API documentation](https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.taxonomies)
 * How-to Guides
     * [Official Documentation](https://cloud.google.com/data-catalog/docs)
 
@@ -41,9 +38,7 @@ To get more information about Taxonomy, see:
 
 ```hcl
 resource "google_data_catalog_taxonomy" "basic_taxonomy" {
-  provider = google-beta
-  region = "us"
-  display_name =  "my_display_name"
+  display_name =  "my_taxonomy"
   description = "A collection of policy tags"
   activated_policy_types = ["FINE_GRAINED_ACCESS_CONTROL"]
 }
@@ -75,7 +70,7 @@ The following arguments are supported:
   (Optional)
   A list of policy types that are activated for this taxonomy. If not set,
   defaults to an empty list.
-  Each value may be one of `POLICY_TYPE_UNSPECIFIED` and `FINE_GRAINED_ACCESS_CONTROL`.
+  Each value may be one of: `POLICY_TYPE_UNSPECIFIED`, `FINE_GRAINED_ACCESS_CONTROL`.
 
 * `region` -
   (Optional)
@@ -99,7 +94,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

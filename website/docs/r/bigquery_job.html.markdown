@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BigQuery"
-page_title: "Google: google_bigquery_job"
 description: |-
   Jobs are actions that BigQuery runs on your behalf to load data, export data, query data, or copy data.
 ---
@@ -471,7 +470,7 @@ The following arguments are supported:
   CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.
   Creation, truncation and append actions occur as one atomic update upon job completion
   Default value is `CREATE_IF_NEEDED`.
-  Possible values are `CREATE_IF_NEEDED` and `CREATE_NEVER`.
+  Possible values are: `CREATE_IF_NEEDED`, `CREATE_NEVER`.
 
 * `write_disposition` -
   (Optional)
@@ -482,7 +481,7 @@ The following arguments are supported:
   Each action is atomic and only occurs if BigQuery is able to complete the job successfully.
   Creation, truncation and append actions occur as one atomic update upon job completion.
   Default value is `WRITE_EMPTY`.
-  Possible values are `WRITE_TRUNCATE`, `WRITE_APPEND`, and `WRITE_EMPTY`.
+  Possible values are: `WRITE_TRUNCATE`, `WRITE_APPEND`, `WRITE_EMPTY`.
 
 * `default_dataset` -
   (Optional)
@@ -493,7 +492,7 @@ The following arguments are supported:
   (Optional)
   Specifies a priority for the query.
   Default value is `INTERACTIVE`.
-  Possible values are `INTERACTIVE` and `BATCH`.
+  Possible values are: `INTERACTIVE`, `BATCH`.
 
 * `allow_large_results` -
   (Optional)
@@ -597,6 +596,7 @@ The following arguments are supported:
   The BigQuery Service Account associated with your project requires access to this encryption key.
 
 * `kms_key_version` -
+  (Output)
   Describes the Cloud KMS encryption key version used to protect destination BigQuery table.
 
 <a name="nested_script_options"></a>The `script_options` block supports:
@@ -613,7 +613,7 @@ The following arguments are supported:
   (Optional)
   Determines which statement in the script represents the "key result",
   used to populate the schema and query results of the script job.
-  Possible values are `LAST` and `FIRST_SELECT`.
+  Possible values are: `LAST`, `FIRST_SELECT`.
 
 <a name="nested_load"></a>The `load` block supports:
 
@@ -638,7 +638,7 @@ The following arguments are supported:
   CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.
   Creation, truncation and append actions occur as one atomic update upon job completion
   Default value is `CREATE_IF_NEEDED`.
-  Possible values are `CREATE_IF_NEEDED` and `CREATE_NEVER`.
+  Possible values are: `CREATE_IF_NEEDED`, `CREATE_NEVER`.
 
 * `write_disposition` -
   (Optional)
@@ -649,7 +649,7 @@ The following arguments are supported:
   Each action is atomic and only occurs if BigQuery is able to complete the job successfully.
   Creation, truncation and append actions occur as one atomic update upon job completion.
   Default value is `WRITE_EMPTY`.
-  Possible values are `WRITE_TRUNCATE`, `WRITE_APPEND`, and `WRITE_EMPTY`.
+  Possible values are: `WRITE_TRUNCATE`, `WRITE_APPEND`, `WRITE_EMPTY`.
 
 * `null_marker` -
   (Optional)
@@ -798,6 +798,7 @@ The following arguments are supported:
   The BigQuery Service Account associated with your project requires access to this encryption key.
 
 * `kms_key_version` -
+  (Output)
   Describes the Cloud KMS encryption key version used to protect destination BigQuery table.
 
 <a name="nested_copy"></a>The `copy` block supports:
@@ -819,7 +820,7 @@ The following arguments are supported:
   CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.
   Creation, truncation and append actions occur as one atomic update upon job completion
   Default value is `CREATE_IF_NEEDED`.
-  Possible values are `CREATE_IF_NEEDED` and `CREATE_NEVER`.
+  Possible values are: `CREATE_IF_NEEDED`, `CREATE_NEVER`.
 
 * `write_disposition` -
   (Optional)
@@ -830,7 +831,7 @@ The following arguments are supported:
   Each action is atomic and only occurs if BigQuery is able to complete the job successfully.
   Creation, truncation and append actions occur as one atomic update upon job completion.
   Default value is `WRITE_EMPTY`.
-  Possible values are `WRITE_TRUNCATE`, `WRITE_APPEND`, and `WRITE_EMPTY`.
+  Possible values are: `WRITE_TRUNCATE`, `WRITE_APPEND`, `WRITE_EMPTY`.
 
 * `destination_encryption_configuration` -
   (Optional)
@@ -876,6 +877,7 @@ The following arguments are supported:
   The BigQuery Service Account associated with your project requires access to this encryption key.
 
 * `kms_key_version` -
+  (Output)
   Describes the Cloud KMS encryption key version used to protect destination BigQuery table.
 
 <a name="nested_extract"></a>The `extract` block supports:
@@ -997,6 +999,7 @@ In addition to the arguments listed above, the following computed attributes are
   Email address of the user who ran the job.
 
 * `job_type` -
+  (Output)
   The type of the job.
 
 * `status` -
@@ -1007,16 +1010,19 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_status"></a>The `status` block contains:
 
 * `error_result` -
+  (Output)
   Final error result of the job. If present, indicates that the job has completed and was unsuccessful.
   Structure is [documented below](#nested_error_result).
 
 * `errors` -
+  (Output)
   The first errors encountered during the running of the job. The final message
   includes the number of errors that caused the process to stop. Errors here do
   not necessarily mean that the job has not completed or was unsuccessful.
   Structure is [documented below](#nested_errors).
 
 * `state` -
+  (Output)
   Running state of the job. Valid states include 'PENDING', 'RUNNING', and 'DONE'.
 
 
@@ -1051,7 +1057,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

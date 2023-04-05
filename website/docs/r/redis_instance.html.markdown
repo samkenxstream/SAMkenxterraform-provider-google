@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Memorystore (Redis)"
-page_title: "Google: google_redis_instance"
 description: |-
   A Google Cloud Redis instance.
 ---
@@ -302,7 +301,7 @@ The following arguments are supported:
   (Optional)
   The connection mode of the Redis instance.
   Default value is `DIRECT_PEERING`.
-  Possible values are `DIRECT_PEERING` and `PRIVATE_SERVICE_ACCESS`.
+  Possible values are: `DIRECT_PEERING`, `PRIVATE_SERVICE_ACCESS`.
 
 * `display_name` -
   (Optional)
@@ -361,14 +360,14 @@ The following arguments are supported:
   - BASIC: standalone instance
   - STANDARD_HA: highly available primary/replica instances
   Default value is `BASIC`.
-  Possible values are `BASIC` and `STANDARD_HA`.
+  Possible values are: `BASIC`, `STANDARD_HA`.
 
 * `transit_encryption_mode` -
   (Optional)
   The TLS mode of the Redis instance, If not provided, TLS is disabled for the instance.
   - SERVER_AUTHENTICATION: Client to Server traffic encryption enabled with server authentication
   Default value is `DISABLED`.
-  Possible values are `SERVER_AUTHENTICATION` and `DISABLED`.
+  Possible values are: `SERVER_AUTHENTICATION`, `DISABLED`.
 
 * `replica_count` -
   (Optional)
@@ -385,7 +384,7 @@ The following arguments are supported:
   instance cannot scale up or down the number of replicas.
   - READ_REPLICAS_ENABLED: If enabled, read endpoint will be provided and the instance
   can scale up and down the number of replicas.
-  Possible values are `READ_REPLICAS_DISABLED` and `READ_REPLICAS_ENABLED`.
+  Possible values are: `READ_REPLICAS_DISABLED`, `READ_REPLICAS_ENABLED`.
 
 * `secondary_ip_range` -
   (Optional)
@@ -406,7 +405,6 @@ The following arguments are supported:
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
 
-* `auth_string` - (Optional) AUTH String set on the instance. This field will only be populated if auth_enabled is true.
 
 <a name="nested_persistence_config"></a>The `persistence_config` block supports:
 
@@ -415,7 +413,7 @@ The following arguments are supported:
   Optional. Controls whether Persistence features are enabled. If not provided, the existing value will be used.
   - DISABLED: 	Persistence is disabled for the instance, and any existing snapshots are deleted.
   - RDB: RDB based Persistence is enabled.
-  Possible values are `DISABLED` and `RDB`.
+  Possible values are: `DISABLED`, `RDB`.
 
 * `rdb_snapshot_period` -
   (Optional)
@@ -424,9 +422,10 @@ The following arguments are supported:
   - SIX_HOURS:	Snapshot every 6 hours.
   - TWELVE_HOURS:	Snapshot every 12 hours.
   - TWENTY_FOUR_HOURS:	Snapshot every 24 hours.
-  Possible values are `ONE_HOUR`, `SIX_HOURS`, `TWELVE_HOURS`, and `TWENTY_FOUR_HOURS`.
+  Possible values are: `ONE_HOUR`, `SIX_HOURS`, `TWELVE_HOURS`, `TWENTY_FOUR_HOURS`.
 
 * `rdb_next_snapshot_time` -
+  (Output)
   Output only. The next time that a snapshot attempt is scheduled to occur.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up
   to nine fractional digits.
@@ -444,11 +443,13 @@ The following arguments are supported:
 <a name="nested_maintenance_policy"></a>The `maintenance_policy` block supports:
 
 * `create_time` -
+  (Output)
   Output only. The time when the policy was created.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
 
 * `update_time` -
+  (Output)
   Output only. The time when the policy was last updated.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
@@ -480,9 +481,10 @@ The following arguments are supported:
   - FRIDAY: Friday
   - SATURDAY: Saturday
   - SUNDAY: Sunday
-  Possible values are `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, and `SUNDAY`.
+  Possible values are: `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.
 
 * `duration` -
+  (Output)
   Output only. Duration of the maintenance window.
   The current window is fixed at 1 hour.
   A duration in seconds with up to nine fractional digits,
@@ -517,16 +519,19 @@ The following arguments are supported:
 <a name="nested_maintenance_schedule"></a>The `maintenance_schedule` block supports:
 
 * `start_time` -
+  (Output)
   Output only. The start time of any upcoming scheduled maintenance for this instance.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
 
 * `end_time` -
+  (Output)
   Output only. The end time of any upcoming scheduled maintenance for this instance.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
 
 * `schedule_deadline_time` -
+  (Output)
   Output only. The deadline that the maintenance schedule start time
   can not go beyond, including reschedule.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
@@ -583,32 +588,39 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_server_ca_certs"></a>The `server_ca_certs` block contains:
 
 * `serial_number` -
+  (Output)
   Serial number, as extracted from the certificate.
 
 * `cert` -
+  (Output)
   The certificate data in PEM format.
 
 * `create_time` -
+  (Output)
   The time when the certificate was created.
 
 * `expire_time` -
+  (Output)
   The time when the certificate expires.
 
 * `sha1_fingerprint` -
+  (Output)
   Sha1 Fingerprint of the certificate.
 
 <a name="nested_nodes"></a>The `nodes` block contains:
 
 * `id` -
+  (Output)
   Node identifying string. e.g. 'node-0', 'node-1'
 
 * `zone` -
+  (Output)
   Location of the node.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

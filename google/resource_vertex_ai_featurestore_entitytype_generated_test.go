@@ -27,16 +27,16 @@ func TestAccVertexAIFeaturestoreEntitytype_vertexAiFeaturestoreEntitytypeExample
 	t.Parallel()
 
 	context := map[string]interface{}{
-		"org_id":          getTestOrgFromEnv(t),
-		"billing_account": getTestBillingAccountFromEnv(t),
+		"org_id":          GetTestOrgFromEnv(t),
+		"billing_account": GetTestBillingAccountFromEnv(t),
 		"kms_key_name":    BootstrapKMSKeyInLocation(t, "us-central1").CryptoKey.Name,
-		"random_suffix":   randString(t, 10),
+		"random_suffix":   RandString(t, 10),
 	}
 
-	vcrTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckVertexAIFeaturestoreEntitytypeDestroyProducer(t),
+	VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckVertexAIFeaturestoreEntitytypeDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccVertexAIFeaturestoreEntitytype_vertexAiFeaturestoreEntitytypeExample(context),
@@ -72,6 +72,7 @@ resource "google_vertex_ai_featurestore_entitytype" "entity" {
   labels = {
     foo = "bar"
   }
+  description = "test description"
   featurestore = google_vertex_ai_featurestore.featurestore.id
   monitoring_config {
     snapshot_analysis {
@@ -104,7 +105,7 @@ func testAccCheckVertexAIFeaturestoreEntitytypeDestroyProducer(t *testing.T) fun
 				continue
 			}
 
-			config := googleProviderConfig(t)
+			config := GoogleProviderConfig(t)
 
 			url, err := replaceVarsForTest(config, rs, "{{VertexAIBasePath}}{{featurestore}}/entityTypes/{{name}}")
 			if err != nil {
@@ -117,7 +118,7 @@ func testAccCheckVertexAIFeaturestoreEntitytypeDestroyProducer(t *testing.T) fun
 				billingProject = config.BillingProject
 			}
 
-			_, err = sendRequest(config, "GET", billingProject, url, config.userAgent, nil)
+			_, err = SendRequest(config, "GET", billingProject, url, config.UserAgent, nil)
 			if err == nil {
 				return fmt.Errorf("VertexAIFeaturestoreEntitytype still exists at %s", url)
 			}

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Identity"
-page_title: "Google: google_cloud_identity_group_membership"
 description: |-
   A Membership defines a relationship between a Group and an entity belonging to that Group, referred to as a "member".
 ---
@@ -135,7 +134,7 @@ The following arguments are supported:
 * `name` -
   (Required)
   The name of the MembershipRole. Must be one of OWNER, MANAGER, MEMBER.
-  Possible values are `OWNER`, `MANAGER`, and `MEMBER`.
+  Possible values are: `OWNER`, `MANAGER`, `MEMBER`.
 
 - - -
 
@@ -213,7 +212,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud (Stackdriver) Monitoring"
-page_title: "Google: google_monitoring_slo"
 description: |-
   A Service-Level Objective (SLO) describes the level of desired good
   service.
@@ -275,7 +274,7 @@ The following arguments are supported:
   (Optional)
   A calendar period, semantically "since the start of the current
   <calendarPeriod>".
-  Possible values are `DAY`, `WEEK`, `FORTNIGHT`, and `MONTH`.
+  Possible values are: `DAY`, `WEEK`, `FORTNIGHT`, `MONTH`.
 
 * `user_labels` -
   (Optional)
@@ -459,14 +458,12 @@ The following arguments are supported:
 * `min` -
   (Optional)
   Min value for the range (inclusive). If not given,
-  will be set to "-infinity", defining an open range
-  "< range.max"
+  will be set to 0
 
 * `max` -
   (Optional)
   max value for the range (inclusive). If not given,
-  will be set to "infinity", defining an open range
-  ">= range.min"
+  will be set to 0
 
 <a name="nested_windows_based_sli"></a>The `windows_based_sli` block supports:
 
@@ -609,14 +606,12 @@ The following arguments are supported:
 * `min` -
   (Optional)
   Min value for the range (inclusive). If not given,
-  will be set to "-infinity", defining an open range
-  "< range.max"
+  will be set to 0
 
 * `max` -
   (Optional)
   max value for the range (inclusive). If not given,
-  will be set to "infinity", defining an open range
-  ">= range.min"
+  will be set to 0
 
 <a name="nested_basic_sli_performance"></a>The `basic_sli_performance` block supports:
 
@@ -760,7 +755,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

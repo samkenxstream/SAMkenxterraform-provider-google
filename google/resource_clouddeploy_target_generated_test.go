@@ -30,15 +30,15 @@ func TestAccClouddeployTarget_Target(t *testing.T) {
 	t.Parallel()
 
 	context := map[string]interface{}{
-		"project_name":  getTestProjectFromEnv(),
-		"region":        getTestRegionFromEnv(),
-		"random_suffix": randString(t, 10),
+		"project_name":  GetTestProjectFromEnv(),
+		"region":        GetTestRegionFromEnv(),
+		"random_suffix": RandString(t, 10),
 	}
 
-	vcrTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckClouddeployTargetDestroyProducer(t),
+	VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckClouddeployTargetDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccClouddeployTarget_Target(context),
@@ -290,7 +290,7 @@ func testAccCheckClouddeployTargetDestroyProducer(t *testing.T) func(s *terrafor
 				continue
 			}
 
-			config := googleProviderConfig(t)
+			config := GoogleProviderConfig(t)
 
 			billingProject := ""
 			if config.BillingProject != "" {
@@ -310,7 +310,7 @@ func testAccCheckClouddeployTargetDestroyProducer(t *testing.T) func(s *terrafor
 				UpdateTime:      dcl.StringOrNil(rs.Primary.Attributes["update_time"]),
 			}
 
-			client := NewDCLClouddeployClient(config, config.userAgent, billingProject, 0)
+			client := NewDCLClouddeployClient(config, config.UserAgent, billingProject, 0)
 			_, err := client.GetTarget(context.Background(), obj)
 			if err == nil {
 				return fmt.Errorf("google_clouddeploy_target still exists %v", obj)

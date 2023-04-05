@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "ContainerAttached"
-page_title: "Google: google_container_attached_cluster"
 description: |-
   An Anthos cluster running on customer owned infrastructure.
 ---
@@ -111,6 +110,40 @@ resource "google_container_attached_cluster" "primary" {
   }
 }
 ```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=container_attached_cluster_ignore_errors&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Container Attached Cluster Ignore Errors
+
+
+```hcl
+data "google_project" "project" {
+}
+
+data "google_container_attached_versions" "versions" {
+	location       = "us-west1"
+	project        = data.google_project.project.project_id
+}
+
+resource "google_container_attached_cluster" "primary" {
+  name     = "basic"
+  location = "us-west1"
+  project = data.google_project.project.project_id
+  description = "Test cluster"
+  distribution = "aks"
+  oidc_config {
+      issuer_url = "https://oidc.issuer.url"
+  }
+  platform_version = data.google_container_attached_versions.versions.valid_versions[0]
+  fleet {
+    project = "projects/${data.google_project.project.number}"
+  }
+
+  deletion_policy = "DELETE_IGNORE_ERRORS"
+}
+```
 
 ## Argument Reference
 
@@ -166,6 +199,7 @@ The following arguments are supported:
 <a name="nested_fleet"></a>The `fleet` block supports:
 
 * `membership` -
+  (Output)
   The name of the managed Hub Membership resource associated to this
   cluster. Membership names are formatted as
   projects/<project-number>/locations/global/membership/<cluster-id>.
@@ -209,6 +243,7 @@ The following arguments are supported:
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
 
+* `deletion_policy` - (Optional) Policy to determine what flags to send on delete.
 
 <a name="nested_logging_config"></a>The `logging_config` block supports:
 
@@ -223,7 +258,7 @@ The following arguments are supported:
 * `enable_components` -
   (Optional)
   The components to be enabled.
-  Each value may be one of `SYSTEM_COMPONENTS` and `WORKLOADS`.
+  Each value may be one of: `SYSTEM_COMPONENTS`, `WORKLOADS`.
 
 <a name="nested_authorization"></a>The `authorization` block supports:
 
@@ -313,7 +348,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

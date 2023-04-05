@@ -14,7 +14,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "ContainerAws"
-page_title: "Google: google_container_aws_cluster"
 description: |-
   An Anthos cluster running on AWS.
 ---
@@ -36,7 +35,7 @@ data "google_container_aws_versions" "versions" {
 resource "google_container_aws_cluster" "primary" {
   authorization {
     admin_users {
-      username = "emailAddress:my@service-account.com"
+      username = "my@service-account.com"
     }
   }
 
@@ -87,7 +86,7 @@ resource "google_container_aws_cluster" "primary" {
     }
 
     tags = {
-      owner = "emailAddress:my@service-account.com"
+      owner = "my@service-account.com"
     }
   }
 
@@ -387,7 +386,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

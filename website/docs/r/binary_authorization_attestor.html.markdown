@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Binary Authorization"
-page_title: "Google: google_binary_authorization_attestor"
 description: |-
   An attestor that attests to container image artifacts.
 ---
@@ -164,6 +163,7 @@ The following arguments are supported:
   Structure is [documented below](#nested_public_keys).
 
 * `delegation_service_account_email` -
+  (Output)
   This field will contain the service account email address that
   this Attestor will use as the principal when querying Container
   Analysis. Attestor administrators must grant this service account
@@ -249,7 +249,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

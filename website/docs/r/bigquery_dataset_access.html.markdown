@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BigQuery"
-page_title: "Google: google_bigquery_dataset_access"
 description: |-
   Gives dataset access for a single entity.
 ---
@@ -27,6 +26,7 @@ it is not possible to compile a full list of access blocks to include in a
 ~> **Note:** If this resource is used alongside a `google_bigquery_dataset` resource, the
 dataset resource must either have no defined `access` blocks or a `lifecycle` block with
 `ignore_changes = [access]` so they don't fight over which accesses should be on the dataset.
+Additionally, both resource cannot be modified in the same apply.
 
 
 To get more information about DatasetAccess, see:
@@ -301,7 +301,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

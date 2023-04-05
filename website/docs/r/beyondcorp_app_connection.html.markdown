@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BeyondCorp"
-page_title: "Google: google_beyondcorp_app_connection"
 description: |-
   A BeyondCorp AppConnection resource represents a BeyondCorp protected AppConnection to a remote application.
 ---
@@ -184,9 +183,11 @@ The following arguments are supported:
   for a list of possible values.
 
 * `uri` -
+  (Output)
   Server-defined URI for this resource.
 
 * `ingress_port` -
+  (Output)
   Ingress port reserved on the gateways for this AppConnection, if not specified or zero, the default port is 19443.
 
 ## Attributes Reference
@@ -199,7 +200,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 30 minutes.
 - `update` - Default is 30 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Data Fusion"
-page_title: "Google: google_data_fusion_instance"
 description: |-
   Represents a Data Fusion instance.
 ---
@@ -42,10 +41,7 @@ resource "google_data_fusion_instance" "basic_instance" {
   name   = "my-instance"
   region = "us-central1"
   type   = "BASIC"
-  # Mark for testing to avoid service networking connection usage that is not cleaned up
-  options = {
-    prober_test_run = "true"
-  }
+  
 }
 ```
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
@@ -66,7 +62,6 @@ resource "google_data_fusion_instance" "extended_instance" {
   enable_stackdriver_logging    = true
   enable_stackdriver_monitoring = true
   private_instance              = true
-  version                       = "6.6.0"
   dataproc_service_account      = data.google_app_engine_default_service_account.default.email
 
   labels = {
@@ -78,10 +73,11 @@ resource "google_data_fusion_instance" "extended_instance" {
     ip_allocation = "${google_compute_global_address.private_ip_alloc.address}/${google_compute_global_address.private_ip_alloc.prefix_length}"
   }
 
-  # Mark for testing to avoid service networking connection usage that is not cleaned up
-  options = {
-    prober_test_run = "true"
+  accelerators {
+    accelerator_type = "CDC"
+    state = "ENABLED"
   }
+  
 }
 
 data "google_app_engine_default_service_account" "default" {
@@ -155,10 +151,7 @@ resource "google_data_fusion_instance" "enterprise_instance" {
   region = "us-central1"
   type = "ENTERPRISE"
   enable_rbac = true
-  # Mark for testing to avoid service networking connection usage that is not cleaned up
-  options = {
-    prober_test_run = "true"
-  }
+  
 }
 ```
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
@@ -174,7 +167,6 @@ resource "google_data_fusion_instance" "event" {
   name    = "my-instance"
   region  = "us-central1"
   type    = "BASIC"
-  version = "6.7.0"
 
   event_publish_config {
     enabled = true
@@ -224,7 +216,7 @@ The following arguments are supported:
   - DEVELOPER: Developer Data Fusion instance. In Developer type, the user will have all features available but
   with restrictive capabilities. This is to help enterprises design and develop their data ingestion and integration 
   pipelines at low cost.
-  Possible values are `BASIC`, `ENTERPRISE`, and `DEVELOPER`.
+  Possible values are: `BASIC`, `ENTERPRISE`, `DEVELOPER`.
 
 
 - - -
@@ -292,6 +284,13 @@ The following arguments are supported:
   Option to enable and pass metadata for event publishing.
   Structure is [documented below](#nested_event_publish_config).
 
+* `accelerators` -
+  (Optional)
+  List of accelerators enabled for this CDF instance.
+  If accelerators are enabled it is possible a permadiff will be created with the Options field. 
+  Users will need to either manually update their state file to include these diffed options, or include the field in a [lifecycle ignore changes block](https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#ignore_changes).
+  Structure is [documented below](#nested_accelerators).
+
 * `region` -
   (Optional)
   The region of the Data Fusion instance.
@@ -328,6 +327,18 @@ The following arguments are supported:
 * `topic` -
   (Required)
   The resource name of the Pub/Sub topic. Format: projects/{projectId}/topics/{topic_id}
+
+<a name="nested_accelerators"></a>The `accelerators` block supports:
+
+* `accelerator_type` -
+  (Required)
+  The type of an accelator for a CDF instance.
+  Possible values are: `CDC`, `HEALTHCARE`, `CCAI_INSIGHTS`.
+
+* `state` -
+  (Required)
+  The type of an accelator for a CDF instance.
+  Possible values are: `ENABLED`, `DISABLED`.
 
 ## Attributes Reference
 
@@ -376,7 +387,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 90 minutes.
 - `update` - Default is 25 minutes.

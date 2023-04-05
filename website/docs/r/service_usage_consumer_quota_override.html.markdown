@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Service Usage"
-page_title: "Google: google_service_usage_consumer_quota_override"
 description: |-
   A consumer override is applied to the consumer on its own authority to limit its own quota usage.
 ---
@@ -30,7 +29,7 @@ See [Provider Versions](https://terraform.io/docs/providers/google/guides/provid
 To get more information about ConsumerQuotaOverride, see:
 
 * How-to Guides
-    * [Getting Started](https://cloud.google.com/service-usage/docs/getting-started)
+    * [Managing Service Quota](https://cloud.google.com/service-usage/docs/manage-quota )
     * [REST API documentation](https://cloud.google.com/service-usage/docs/reference/rest/v1beta1/services.consumerQuotaMetrics.limits.consumerOverrides)
 
 ## Example Usage - Consumer Quota Override
@@ -156,7 +155,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

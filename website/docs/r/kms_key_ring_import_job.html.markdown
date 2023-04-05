@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Key Management Service"
-page_title: "Google: google_kms_key_ring_import_job"
 description: |-
   A `KeyRingImportJob` can be used to create `CryptoKeys` and `CryptoKeyVersions` using pre-existing
   key material, generated outside of Cloud KMS.
@@ -70,13 +69,13 @@ The following arguments are supported:
 * `import_method` -
   (Required)
   The wrapping method to be used for incoming key material.
-  Possible values are `RSA_OAEP_3072_SHA1_AES_256` and `RSA_OAEP_4096_SHA1_AES_256`.
+  Possible values are: `RSA_OAEP_3072_SHA1_AES_256`, `RSA_OAEP_4096_SHA1_AES_256`.
 
 * `protection_level` -
   (Required)
   The protection level of the ImportJob. This must match the protectionLevel of the
   versionTemplate on the CryptoKey you attempt to import into.
-  Possible values are `SOFTWARE`, `HSM`, and `EXTERNAL`.
+  Possible values are: `SOFTWARE`, `HSM`, `EXTERNAL`.
 
 * `key_ring` -
   (Required)
@@ -122,22 +121,25 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_public_key"></a>The `public_key` block contains:
 
 * `pem` -
+  (Output)
   The public key, encoded in PEM format. For more information, see the RFC 7468 sections
   for General Considerations and Textual Encoding of Subject Public Key Info.
 
 <a name="nested_attestation"></a>The `attestation` block contains:
 
 * `format` -
+  (Output)
   The format of the attestation data.
 
 * `content` -
+  (Output)
   The attestation data provided by the HSM when the key operation was performed.
   A base64-encoded string.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

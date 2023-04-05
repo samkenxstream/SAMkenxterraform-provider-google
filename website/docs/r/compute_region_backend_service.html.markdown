@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_region_backend_service"
 description: |-
   A Region Backend Service defines a regionally-scoped group of virtual
   machines that will serve traffic for load balancing.
@@ -31,8 +30,9 @@ To get more information about RegionBackendService, see:
 * How-to Guides
     * [Internal TCP/UDP Load Balancing](https://cloud.google.com/compute/docs/load-balancing/internal/)
 
-~> **Warning:** All arguments including `iap.oauth2_client_secret` and `iap.oauth2_client_secret_sha256` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `iap.oauth2_client_secret`, `iap.oauth2_client_secret_sha256`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
   <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=region_backend_service_basic&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
@@ -151,6 +151,33 @@ resource "google_compute_region_health_check" "health_check" {
   region             = "us-central1"
 
   tcp_health_check {
+    port = 80
+  }
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=region_backend_service_external_weighted&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Region Backend Service External Weighted
+
+
+```hcl
+resource "google_compute_region_backend_service" "default" {
+  region                = "us-central1"
+  name                  = "region-service"
+  health_checks         = [google_compute_region_health_check.health_check.id]
+  protocol              = "TCP"
+  load_balancing_scheme = "EXTERNAL"
+  locality_lb_policy    = "WEIGHTED_MAGLEV"
+}
+
+resource "google_compute_region_health_check" "health_check" {
+  name               = "rbs-health-check"
+  region             = "us-central1"
+
+  http_health_check {
     port = 80
   }
 }
@@ -409,7 +436,7 @@ The following arguments are supported:
   balancing cannot be used with the other(s). For more information, refer to
   [Choosing a load balancer](https://cloud.google.com/load-balancing/docs/backend-service).
   Default value is `INTERNAL`.
-  Possible values are `EXTERNAL`, `EXTERNAL_MANAGED`, `INTERNAL`, and `INTERNAL_MANAGED`.
+  Possible values are: `EXTERNAL`, `EXTERNAL_MANAGED`, `INTERNAL`, `INTERNAL_MANAGED`.
 
 * `locality_lb_policy` -
   (Optional)
@@ -433,18 +460,33 @@ The following arguments are supported:
               Maglev is not as stable as ring hash but has faster table lookup
               build times and host selection times. For more information about
               Maglev, refer to https://ai.google/research/pubs/pub44824
+  * `WEIGHTED_MAGLEV`: Per-instance weighted Load Balancing via health check
+                       reported weights. If set, the Backend Service must
+                       configure a non legacy HTTP-based Health Check, and
+                       health check replies are expected to contain
+                       non-standard HTTP response header field
+                       X-Load-Balancing-Endpoint-Weight to specify the
+                       per-instance weights. If set, Load Balancing is weight
+                       based on the per-instance weights reported in the last
+                       processed health check replies, as long as every
+                       instance either reported a valid weight or had
+                       UNAVAILABLE_WEIGHT. Otherwise, Load Balancing remains
+                       equal-weight.
 
   This field is applicable to either:
   * A regional backend service with the service_protocol set to HTTP, HTTPS, or HTTP2,
     and loadBalancingScheme set to INTERNAL_MANAGED.
   * A global backend service with the load_balancing_scheme set to INTERNAL_SELF_MANAGED.
+  * A regional backend service with loadBalancingScheme set to EXTERNAL (External Network
+    Load Balancing). Only MAGLEV and WEIGHTED_MAGLEV values are possible for External
+    Network Load Balancing. The default is MAGLEV.
 
-  If session_affinity is not NONE, and this field is not set to MAGLEV or RING_HASH,
-  session affinity settings will not take effect.
+  If session_affinity is not NONE, and this field is not set to MAGLEV, WEIGHTED_MAGLEV,
+  or RING_HASH, session affinity settings will not take effect.
   Only ROUND_ROBIN and RING_HASH are supported when the backend service is referenced
   by a URL map that is bound to target gRPC proxy that has validate_for_proxyless
   field set to true.
-  Possible values are `ROUND_ROBIN`, `LEAST_REQUEST`, `RING_HASH`, `RANDOM`, `ORIGINAL_DESTINATION`, and `MAGLEV`.
+  Possible values are: `ROUND_ROBIN`, `LEAST_REQUEST`, `RING_HASH`, `RANDOM`, `ORIGINAL_DESTINATION`, `MAGLEV`, `WEIGHTED_MAGLEV`.
 
 * `outlier_detection` -
   (Optional)
@@ -468,13 +510,13 @@ The following arguments are supported:
   The protocol this RegionBackendService uses to communicate with backends.
   The default is HTTP. **NOTE**: HTTP2 is only valid for beta HTTP/2 load balancer
   types and may result in errors if used with the GA API.
-  Possible values are `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`, `UDP`, `GRPC`, and `UNSPECIFIED`.
+  Possible values are: `HTTP`, `HTTPS`, `HTTP2`, `SSL`, `TCP`, `UDP`, `GRPC`, `UNSPECIFIED`.
 
 * `session_affinity` -
   (Optional)
   Type of session affinity to use. The default is NONE. Session affinity is
   not applicable if the protocol is UDP.
-  Possible values are `NONE`, `CLIENT_IP`, `CLIENT_IP_PORT_PROTO`, `CLIENT_IP_PROTO`, `GENERATED_COOKIE`, `HEADER_FIELD`, `HTTP_COOKIE`, and `CLIENT_IP_NO_DESTINATION`.
+  Possible values are: `NONE`, `CLIENT_IP`, `CLIENT_IP_PORT_PROTO`, `CLIENT_IP_PROTO`, `GENERATED_COOKIE`, `HEADER_FIELD`, `HTTP_COOKIE`, `CLIENT_IP_NO_DESTINATION`.
 
 * `connection_tracking_policy` -
   (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
@@ -521,7 +563,7 @@ The following arguments are supported:
   See the [Backend Services Overview](https://cloud.google.com/load-balancing/docs/backend-service#balancing-mode)
   for an explanation of load balancing modes.
   Default value is `CONNECTION`.
-  Possible values are `UTILIZATION`, `RATE`, and `CONNECTION`.
+  Possible values are: `UTILIZATION`, `RATE`, `CONNECTION`.
 
 * `capacity_scaler` -
   (Optional)
@@ -773,7 +815,7 @@ The following arguments are supported:
   (Optional)
   Specifies the cache setting for all responses from this backend.
   The possible values are: USE_ORIGIN_HEADERS, FORCE_CACHE_ALL and CACHE_ALL_STATIC
-  Possible values are `USE_ORIGIN_HEADERS`, `FORCE_CACHE_ALL`, and `CACHE_ALL_STATIC`.
+  Possible values are: `USE_ORIGIN_HEADERS`, `FORCE_CACHE_ALL`, `CACHE_ALL_STATIC`.
 
 * `serve_while_stale` -
   (Optional)
@@ -874,6 +916,7 @@ The following arguments are supported:
   **Note**: This property is sensitive and will not be displayed in the plan.
 
 * `oauth2_client_secret_sha256` -
+  (Output)
   OAuth2 Client Secret SHA-256 for IAP
   **Note**: This property is sensitive and will not be displayed in the plan.
 
@@ -995,7 +1038,7 @@ The following arguments are supported:
   `PER_SESSION`: The Connection Tracking is performed as per the
   configured Session Affinity. It matches the configured Session Affinity.
   Default value is `PER_CONNECTION`.
-  Possible values are `PER_CONNECTION` and `PER_SESSION`.
+  Possible values are: `PER_CONNECTION`, `PER_SESSION`.
 
 * `connection_persistence_on_unhealthy_backends` -
   (Optional)
@@ -1013,7 +1056,7 @@ The following arguments are supported:
   unhealthy backends regardless of protocol and session affinity. It is
   generally not recommended to use this mode overriding the default.
   Default value is `DEFAULT_FOR_PROTOCOL`.
-  Possible values are `DEFAULT_FOR_PROTOCOL`, `NEVER_PERSIST`, and `ALWAYS_PERSIST`.
+  Possible values are: `DEFAULT_FOR_PROTOCOL`, `NEVER_PERSIST`, `ALWAYS_PERSIST`.
 
 <a name="nested_log_config"></a>The `log_config` block supports:
 
@@ -1033,7 +1076,7 @@ The following arguments are supported:
 * `policy` -
   (Required)
   The algorithm used for subsetting.
-  Possible values are `CONSISTENT_HASH_SUBSETTING`.
+  Possible values are: `CONSISTENT_HASH_SUBSETTING`.
 
 ## Attributes Reference
 
@@ -1053,7 +1096,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

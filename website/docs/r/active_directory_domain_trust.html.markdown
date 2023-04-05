@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Managed Microsoft Active Directory"
-page_title: "Google: google_active_directory_domain_trust"
 description: |-
   Adds a trust between Active Directory domains
 ---
@@ -29,8 +28,9 @@ To get more information about DomainTrust, see:
 * How-to Guides
     * [Active Directory Trust](https://cloud.google.com/managed-microsoft-ad/docs/create-one-way-trust)
 
-~> **Warning:** All arguments including `trust_handshake_secret` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `trust_handshake_secret`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 ## Example Usage - Active Directory Domain Trust Basic
 
@@ -58,12 +58,12 @@ The following arguments are supported:
 * `trust_type` -
   (Required)
   The type of trust represented by the trust resource.
-  Possible values are `FOREST` and `EXTERNAL`.
+  Possible values are: `FOREST`, `EXTERNAL`.
 
 * `trust_direction` -
   (Required)
   The trust direction, which decides if the current domain is trusted, trusting, or both.
-  Possible values are `INBOUND`, `OUTBOUND`, and `BIDIRECTIONAL`.
+  Possible values are: `INBOUND`, `OUTBOUND`, `BIDIRECTIONAL`.
 
 * `target_dns_ip_addresses` -
   (Required)
@@ -101,7 +101,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Data loss prevention"
-page_title: "Google: google_data_loss_prevention_job_trigger"
 description: |-
   A job trigger configuration.
 ---
@@ -199,7 +198,7 @@ The following arguments are supported:
   (Optional)
   Whether the trigger is currently active.
   Default value is `HEALTHY`.
-  Possible values are `PAUSED`, `HEALTHY`, and `CANCELLED`.
+  Possible values are: `PAUSED`, `HEALTHY`, `CANCELLED`.
 
 * `inspect_job` -
   (Optional)
@@ -337,13 +336,13 @@ The following arguments are supported:
   List of file type groups to include in the scan. If empty, all files are scanned and available data
   format processors are applied. In addition, the binary content of the selected files is always scanned as well.
   Images are scanned only as binary if the specified region does not support image inspection and no fileTypes were specified.
-  Each value may be one of `BINARY_FILE`, `TEXT_FILE`, `IMAGE`, `WORD`, `PDF`, `AVRO`, `CSV`, and `TSV`.
+  Each value may be one of: `BINARY_FILE`, `TEXT_FILE`, `IMAGE`, `WORD`, `PDF`, `AVRO`, `CSV`, `TSV`.
 
 * `sample_method` -
   (Optional)
   How to sample bytes if not all bytes are scanned. Meaningful only when used in conjunction with bytesLimitPerFile.
   If not specified, scanning would start from the top.
-  Possible values are `TOP` and `RANDOM_START`.
+  Possible values are: `TOP`, `RANDOM_START`.
 
 
 <a name="nested_file_set"></a>The `file_set` block supports:
@@ -404,7 +403,7 @@ The following arguments are supported:
   How to sample rows if not all rows are scanned. Meaningful only when used in conjunction with either 
   rowsLimit or rowsLimitPercent. If not specified, rows are scanned in the order BigQuery reads them.
   Default value is `TOP`.
-  Possible values are `TOP` and `RANDOM_START`.
+  Possible values are: `TOP`, `RANDOM_START`.
 
 * `identifying_fields` -
   (Optional)
@@ -437,13 +436,21 @@ The following arguments are supported:
 
 * `save_findings` -
   (Optional)
-  Schedule for triggered jobs
+  If set, the detailed findings will be persisted to the specified OutputStorageConfig. Only a single instance of this action can be specified. Compatible with: Inspect, Risk
   Structure is [documented below](#nested_save_findings).
 
 * `pub_sub` -
   (Optional)
   Publish a message into a given Pub/Sub topic when the job completes.
   Structure is [documented below](#nested_pub_sub).
+
+* `publish_summary_to_cscc` -
+  (Optional)
+  Publish the result summary of a DlpJob to the Cloud Security Command Center.
+
+* `publish_findings_to_cloud_data_catalog` -
+  (Optional)
+  Publish findings of a DlpJob to Data Catalog.
 
 
 <a name="nested_save_findings"></a>The `save_findings` block supports:
@@ -470,7 +477,7 @@ The following arguments are supported:
   If unspecified, then all available columns will be used for a new table or an (existing)
   table with no schema, and no changes will be made to an existing table that has a schema.
   Only for use with external storage.
-  Possible values are `BASIC_COLUMNS`, `GCS_COLUMNS`, `DATASTORE_COLUMNS`, `BIG_QUERY_COLUMNS`, and `ALL_COLUMNS`.
+  Possible values are: `BASIC_COLUMNS`, `GCS_COLUMNS`, `DATASTORE_COLUMNS`, `BIG_QUERY_COLUMNS`, `ALL_COLUMNS`.
 
 
 <a name="nested_table"></a>The `table` block supports:
@@ -510,7 +517,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

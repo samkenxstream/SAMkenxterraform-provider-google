@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "AlloyDB"
-page_title: "Google: google_alloydb_cluster"
 description: |-
   A managed alloydb cluster.
 ---
@@ -22,17 +21,16 @@ description: |-
 
 A managed alloydb cluster.
 
-~> **Warning:** This resource is in beta, and should be used with the terraform-provider-google-beta provider.
-See [Provider Versions](https://terraform.io/docs/providers/google/guides/provider_versions.html) for more details on beta resources.
 
 To get more information about Cluster, see:
 
-* [API documentation](https://cloud.google.com/alloydb/docs/reference/rest/v1beta/projects.locations.clusters/create)
+* [API documentation](https://cloud.google.com/alloydb/docs/reference/rest/v1/projects.locations.clusters/create)
 * How-to Guides
     * [AlloyDB](https://cloud.google.com/alloydb/docs/)
 
-~> **Warning:** All arguments including `initial_user.password` will be stored in the raw
-state as plain-text. [Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
+~> **Warning:** All arguments including the following potentially sensitive
+values will be stored in the raw state as plain text: `initial_user.password`.
+[Read more about sensitive data in state](https://www.terraform.io/language/state/sensitive-data).
 
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
   <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=alloydb_cluster_basic&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
@@ -44,18 +42,14 @@ state as plain-text. [Read more about sensitive data in state](https://www.terra
 
 ```hcl
 resource "google_alloydb_cluster" "default" {
-  provider   = google-beta
   cluster_id = "alloydb-cluster"
   location   = "us-central1"
   network    = "projects/${data.google_project.project.number}/global/networks/${google_compute_network.default.name}"
 }
 
-data "google_project" "project" {
-  provider = google-beta
-}
+data "google_project" "project" {}
 
 resource "google_compute_network" "default" {
-  provider = google-beta
   name = "alloydb-cluster"
 }
 ```
@@ -69,7 +63,6 @@ resource "google_compute_network" "default" {
 
 ```hcl
 resource "google_alloydb_cluster" "full" {
-  provider     = google-beta
   cluster_id   = "alloydb-cluster-full"
   location     = "us-central1"
   network      = "projects/${data.google_project.project.number}/global/networks/${google_compute_network.default.name}"
@@ -109,12 +102,9 @@ resource "google_alloydb_cluster" "full" {
   }
 }
 
-data "google_project" "project" {
-  provider = google-beta
-}
+data "google_project" "project" {}
 
 resource "google_compute_network" "default" {
-  provider = google-beta
   name = "alloydb-cluster-full"
 }
 ```
@@ -208,7 +198,7 @@ The following arguments are supported:
 
 * `enabled` -
   (Optional)
-  Whether automated automated backups are enabled.
+  Whether automated backups are enabled.
 
 
 <a name="nested_weekly_schedule"></a>The `weekly_schedule` block supports:
@@ -216,7 +206,7 @@ The following arguments are supported:
 * `days_of_week` -
   (Optional)
   The days of the week to perform a backup. At least one day of the week must be provided.
-  Each value may be one of `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, and `SUNDAY`.
+  Each value may be one of: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.
 
 * `start_times` -
   (Required)
@@ -302,7 +292,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 10 minutes.
 - `update` - Default is 10 minutes.

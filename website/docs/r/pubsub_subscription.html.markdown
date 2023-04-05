@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Pub/Sub"
-page_title: "Google: google_pubsub_subscription"
 description: |-
   A named resource representing the stream of messages from a single,
   specific topic, to be delivered to the subscribing application.
@@ -163,7 +162,7 @@ resource "google_pubsub_subscription" "example" {
   topic = google_pubsub_topic.example.name
 
   bigquery_config {
-    table = "${google_bigquery_table.test.project}:${google_bigquery_table.test.dataset_id}.${google_bigquery_table.test.table_id}"
+    table = "${google_bigquery_table.test.project}.${google_bigquery_table.test.dataset_id}.${google_bigquery_table.test.table_id}"
   }
 
   depends_on = [google_project_iam_member.viewer, google_project_iam_member.editor]
@@ -412,7 +411,7 @@ The following arguments are supported:
   (Required)
   Specifies the "time-to-live" duration for an associated resource. The
   resource expires if it is not active for a period of ttl.
-  If ttl is not set, the associated resource never expires.
+  If ttl is set to "", the associated resource never expires.
   A duration in seconds with up to nine fractional digits, terminated by 's'.
   Example - "3.5s".
 
@@ -463,7 +462,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

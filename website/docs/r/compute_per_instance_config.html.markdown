@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_per_instance_config"
 description: |-
   A config defined for a single managed instance that belongs to an instance group manager.
 ---
@@ -163,6 +162,16 @@ State will be removed on the next instance recreation or update.
   Stateful disks for the instance.
   Structure is [documented below](#nested_disk).
 
+* `internal_ip` -
+  (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
+  Preserved internal IPs defined for this instance. This map is keyed with the name of the network interface.
+  Structure is [documented below](#nested_internal_ip).
+
+* `external_ip` -
+  (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
+  Preserved external IPs defined for this instance. This map is keyed with the name of the network interface.
+  Structure is [documented below](#nested_external_ip).
+
 
 <a name="nested_disk"></a>The `disk` block supports:
 
@@ -179,7 +188,7 @@ State will be removed on the next instance recreation or update.
   (Optional)
   The mode of the disk.
   Default value is `READ_WRITE`.
-  Possible values are `READ_ONLY` and `READ_WRITE`.
+  Possible values are: `READ_ONLY`, `READ_WRITE`.
 
 * `delete_rule` -
   (Optional)
@@ -189,7 +198,51 @@ State will be removed on the next instance recreation or update.
   `ON_PERMANENT_INSTANCE_DELETION` will delete the stateful disk when the VM is permanently
   deleted from the instance group.
   Default value is `NEVER`.
-  Possible values are `NEVER` and `ON_PERMANENT_INSTANCE_DELETION`.
+  Possible values are: `NEVER`, `ON_PERMANENT_INSTANCE_DELETION`.
+
+<a name="nested_internal_ip"></a>The `internal_ip` block supports:
+
+* `interface_name` - (Required) The identifier for this object. Format specified above.
+
+* `auto_delete` -
+  (Optional)
+  These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted.
+  Default value is `NEVER`.
+  Possible values are: `NEVER`, `ON_PERMANENT_INSTANCE_DELETION`.
+
+* `ip_address` -
+  (Optional)
+  Ip address representation
+  Structure is [documented below](#nested_ip_address).
+
+
+<a name="nested_ip_address"></a>The `ip_address` block supports:
+
+* `address` -
+  (Optional)
+  The URL of the reservation for this IP address.
+
+<a name="nested_external_ip"></a>The `external_ip` block supports:
+
+* `interface_name` - (Required) The identifier for this object. Format specified above.
+
+* `auto_delete` -
+  (Optional)
+  These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted.
+  Default value is `NEVER`.
+  Possible values are: `NEVER`, `ON_PERMANENT_INSTANCE_DELETION`.
+
+* `ip_address` -
+  (Optional)
+  Ip address representation
+  Structure is [documented below](#nested_ip_address).
+
+
+<a name="nested_ip_address"></a>The `ip_address` block supports:
+
+* `address` -
+  (Optional)
+  The URL of the reservation for this IP address.
 
 ## Attributes Reference
 
@@ -201,7 +254,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

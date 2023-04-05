@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Dataproc metastore"
-page_title: "Google: google_dataproc_metastore_service"
 description: |-
   A managed metastore service that serves metadata queries.
 ---
@@ -149,7 +148,7 @@ The following arguments are supported:
 * `tier` -
   (Optional)
   The tier of the service.
-  Possible values are `DEVELOPER` and `ENTERPRISE`.
+  Possible values are: `DEVELOPER`, `ENTERPRISE`.
 
 * `maintenance_window` -
   (Optional)
@@ -178,13 +177,13 @@ The following arguments are supported:
   (Optional)
   The database type that the Metastore service stores its data.
   Default value is `MYSQL`.
-  Possible values are `MYSQL` and `SPANNER`.
+  Possible values are: `MYSQL`, `SPANNER`.
 
 * `release_channel` -
   (Optional)
   The release channel of the service. If unspecified, defaults to `STABLE`.
   Default value is `STABLE`.
-  Possible values are `CANARY` and `STABLE`.
+  Possible values are: `CANARY`, `STABLE`.
 
 * `metadata_integration` -
   (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
@@ -214,7 +213,7 @@ The following arguments are supported:
 * `day_of_week` -
   (Required)
   The day of week, when the window starts.
-  Possible values are `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, and `SUNDAY`.
+  Possible values are: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.
 
 <a name="nested_encryption_config"></a>The `encryption_config` block supports:
 
@@ -229,7 +228,7 @@ The following arguments are supported:
   (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html))
   The protocol to use for the metastore service endpoint. If unspecified, defaults to `THRIFT`.
   Default value is `THRIFT`.
-  Possible values are `THRIFT` and `GRPC`.
+  Possible values are: `THRIFT`, `GRPC`.
 
 * `version` -
   (Required)
@@ -302,6 +301,7 @@ The following arguments are supported:
 <a name="nested_consumers"></a>The `consumers` block supports:
 
 * `endpoint_uri` -
+  (Output)
   The URI of the endpoint used to access the metastore service.
 
 * `subnetwork` -
@@ -331,7 +331,7 @@ The following arguments are supported:
   (Optional)
   The output format of the Dataproc Metastore service's logs.
   Default value is `JSON`.
-  Possible values are `LEGACY` and `JSON`.
+  Possible values are: `LEGACY`, `JSON`.
 
 ## Attributes Reference
 
@@ -361,7 +361,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 60 minutes.
 - `update` - Default is 60 minutes.

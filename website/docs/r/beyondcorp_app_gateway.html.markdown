@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BeyondCorp"
-page_title: "Google: google_beyondcorp_app_gateway"
 description: |-
   A BeyondCorp AppGateway resource represents a BeyondCorp protected AppGateway to a remote application.
 ---
@@ -90,13 +89,13 @@ The following arguments are supported:
   (Optional)
   The type of network connectivity used by the AppGateway.
   Default value is `TYPE_UNSPECIFIED`.
-  Possible values are `TYPE_UNSPECIFIED` and `TCP_PROXY`.
+  Possible values are: `TYPE_UNSPECIFIED`, `TCP_PROXY`.
 
 * `host_type` -
   (Optional)
   The type of hosting used by the AppGateway.
   Default value is `HOST_TYPE_UNSPECIFIED`.
-  Possible values are `HOST_TYPE_UNSPECIFIED` and `GCP_REGIONAL_MIG`.
+  Possible values are: `HOST_TYPE_UNSPECIFIED`, `GCP_REGIONAL_MIG`.
 
 * `display_name` -
   (Optional)
@@ -140,7 +139,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `delete` - Default is 20 minutes.

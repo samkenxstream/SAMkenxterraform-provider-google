@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Memcache"
-page_title: "Google: google_memcache_instance"
 description: |-
   A Google Cloud Memcache instance.
 ---
@@ -146,7 +145,7 @@ The following arguments are supported:
   Currently the latest supported major version is MEMCACHE_1_5. The minor version will be automatically
   determined by our system based on the latest supported minor version.
   Default value is `MEMCACHE_1_5`.
-  Possible values are `MEMCACHE_1_5`.
+  Possible values are: `MEMCACHE_1_5`.
 
 * `memcache_parameters` -
   (Optional)
@@ -169,6 +168,7 @@ The following arguments are supported:
 <a name="nested_memcache_parameters"></a>The `memcache_parameters` block supports:
 
 * `id` -
+  (Output)
   This is a unique ID associated with this set of parameters.
 
 * `params` -
@@ -178,11 +178,13 @@ The following arguments are supported:
 <a name="nested_maintenance_policy"></a>The `maintenance_policy` block supports:
 
 * `create_time` -
+  (Output)
   Output only. The time when the policy was created.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits
 
 * `update_time` -
+  (Output)
   Output only. The time when the policy was updated.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
@@ -214,7 +216,7 @@ The following arguments are supported:
   - FRIDAY: Friday
   - SATURDAY: Saturday
   - SUNDAY: Sunday
-  Possible values are `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, and `SUNDAY`.
+  Possible values are: `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.
 
 * `duration` -
   (Required)
@@ -275,33 +277,41 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_memcache_nodes"></a>The `memcache_nodes` block contains:
 
 * `node_id` -
+  (Output)
   Identifier of the Memcached node. The node id does not include project or location like the Memcached instance name.
 
 * `zone` -
+  (Output)
   Location (GCP Zone) for the Memcached node.
 
 * `port` -
+  (Output)
   The port number of the Memcached server on this node.
 
 * `host` -
+  (Output)
   Hostname or IP address of the Memcached node used by the clients to connect to the Memcached server on this node.
 
 * `state` -
+  (Output)
   Current state of the Memcached node.
 
 <a name="nested_maintenance_schedule"></a>The `maintenance_schedule` block contains:
 
 * `start_time` -
+  (Output)
   Output only. The start time of any upcoming scheduled maintenance for this instance.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
 
 * `end_time` -
+  (Output)
   Output only. The end time of any upcoming scheduled maintenance for this instance.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
   resolution and up to nine fractional digits.
 
 * `schedule_deadline_time` -
+  (Output)
   Output only. The deadline that the maintenance schedule start time
   can not go beyond, including reschedule.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond
@@ -310,7 +320,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

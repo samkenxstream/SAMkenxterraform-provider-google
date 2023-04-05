@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Data loss prevention"
-page_title: "Google: google_data_loss_prevention_inspect_template"
 description: |-
   An inspect job template.
 ---
@@ -251,7 +250,7 @@ The following arguments are supported:
   (Optional)
   Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info
   Default value is `POSSIBLE`.
-  Possible values are `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, and `VERY_LIKELY`.
+  Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.
 
 * `limits` -
   (Optional)
@@ -269,7 +268,7 @@ The following arguments are supported:
 * `content_options` -
   (Optional)
   List of options defining data content to scan. If empty, text, images, and other content will be included.
-  Each value may be one of `CONTENT_TEXT` and `CONTENT_IMAGE`.
+  Each value may be one of: `CONTENT_TEXT`, `CONTENT_IMAGE`.
 
 * `rule_set` -
   (Optional)
@@ -413,7 +412,7 @@ The following arguments are supported:
 * `fixed_likelihood` -
   (Optional)
   Set the likelihood of a finding to a fixed value. Either this or relative_likelihood can be set.
-  Possible values are `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, and `VERY_LIKELY`.
+  Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.
 
 * `relative_likelihood` -
   (Optional)
@@ -429,7 +428,7 @@ The following arguments are supported:
 * `matching_type` -
   (Required)
   How the rule is applied. See the documentation for more information: https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#MatchingType
-  Possible values are `MATCHING_TYPE_FULL_MATCH`, `MATCHING_TYPE_PARTIAL_MATCH`, and `MATCHING_TYPE_INVERSE_MATCH`.
+  Possible values are: `MATCHING_TYPE_FULL_MATCH`, `MATCHING_TYPE_PARTIAL_MATCH`, `MATCHING_TYPE_INVERSE_MATCH`.
 
 * `dictionary` -
   (Optional)
@@ -514,12 +513,12 @@ The following arguments are supported:
   Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria
   specified by the rule.
   Default value is `VERY_LIKELY`.
-  Possible values are `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, and `VERY_LIKELY`.
+  Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.
 
 * `exclusion_type` -
   (Optional)
   If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching.
-  Possible values are `EXCLUSION_TYPE_EXCLUDE`.
+  Possible values are: `EXCLUSION_TYPE_EXCLUDE`.
 
 * `regex` -
   (Optional)
@@ -601,7 +600,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

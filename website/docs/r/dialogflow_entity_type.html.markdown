@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Dialogflow"
-page_title: "Google: google_dialogflow_entity_type"
 description: |-
   Represents an entity type.
 ---
@@ -70,7 +69,7 @@ The following arguments are supported:
   * KIND_LIST: List entity types contain a set of entries that do not map to reference values. However, list entity
   types can contain references to other entity types (with or without aliases).
   * KIND_REGEXP: Regexp entity types allow to specify regular expressions in entries values.
-  Possible values are `KIND_MAP`, `KIND_LIST`, and `KIND_REGEXP`.
+  Possible values are: `KIND_MAP`, `KIND_LIST`, `KIND_REGEXP`.
 
 
 - - -
@@ -121,7 +120,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

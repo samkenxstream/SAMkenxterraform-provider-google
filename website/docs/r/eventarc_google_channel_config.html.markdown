@@ -14,7 +14,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Eventarc"
-page_title: "Google: google_eventarc_google_channel_config"
 description: |-
   The Eventarc GoogleChannelConfig resource
 ---
@@ -39,13 +38,11 @@ data "google_kms_crypto_key" "key" {
 	key_ring = data.google_kms_key_ring.test_key_ring.id
 }
 
-resource "google_kms_crypto_key_iam_binding" "key1_binding" {
+resource "google_kms_crypto_key_iam_member" "key1_member" {
     crypto_key_id = data.google_kms_crypto_key.key1.id
     role      = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
 
-    members = [
-    "serviceAccount:service-${data.google_project.test_project.number}@gcp-sa-eventarc.iam.gserviceaccount.com",
-    ]
+    member = "serviceAccount:service-${data.google_project.test_project.number}@gcp-sa-eventarc.iam.gserviceaccount.com"
 }
 
 resource "google_eventarc_google_channel_config" "primary" {
@@ -53,7 +50,7 @@ resource "google_eventarc_google_channel_config" "primary" {
   name     = "channel"
   project  = "${data.google_project.test_project.project_id}"
   crypto_key_name =  "${data.google_kms_crypto_key.key1.id}"
-  depends_on = [google_kms_crypto_key_iam_binding.key1_binding]
+  depends_on = [google_kms_crypto_key_iam_member.key1_member]
 }
 ```
 
@@ -95,7 +92,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

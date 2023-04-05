@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_packet_mirroring"
 description: |-
   Packet Mirroring mirrors traffic to and from particular VM instances.
 ---
@@ -232,7 +231,7 @@ The following arguments are supported:
   (Optional)
   Direction of traffic to mirror.
   Default value is `BOTH`.
-  Possible values are `INGRESS`, `EGRESS`, and `BOTH`.
+  Possible values are: `INGRESS`, `EGRESS`, `BOTH`.
 
 ## Attributes Reference
 
@@ -244,7 +243,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

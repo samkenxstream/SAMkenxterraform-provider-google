@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_firewall"
 description: |-
   Each network has its own firewall controlling access to and from the
   instances.
@@ -135,7 +134,7 @@ The following arguments are supported:
   (Optional)
   If destination ranges are specified, the firewall will apply only to
   traffic that has destination IP address in these ranges. These ranges
-  must be expressed in CIDR format. Only IPv4 is supported.
+  must be expressed in CIDR format. IPv4 or IPv6 ranges are supported.
 
 * `direction` -
   (Optional)
@@ -144,7 +143,7 @@ The following arguments are supported:
   destinationRanges; For EGRESS traffic, it is NOT supported to specify
   `source_ranges` OR `source_tags`. For INGRESS traffic, one of `source_ranges`,
   `source_tags` or `source_service_accounts` is required.
-  Possible values are `INGRESS` and `EGRESS`.
+  Possible values are: `INGRESS`, `EGRESS`.
 
 * `disabled` -
   (Optional)
@@ -177,8 +176,8 @@ The following arguments are supported:
   apply to traffic that has source IP address within sourceRanges OR the
   source IP that belongs to a tag listed in the sourceTags property. The
   connection does not need to match both properties for the firewall to
-  apply. Only IPv4 is supported. For INGRESS traffic, one of `source_ranges`,
-  `source_tags` or `source_service_accounts` is required.
+  apply. IPv4 or IPv6 ranges are supported. For INGRESS traffic, one of
+  `source_ranges`, `source_tags` or `source_service_accounts` is required.
 
 * `source_service_accounts` -
   (Optional)
@@ -271,7 +270,7 @@ If logging is enabled, logs will be exported to Stackdriver. Deprecated in favor
 * `metadata` -
   (Required)
   This field denotes whether to include or exclude metadata for firewall logs.
-  Possible values are `EXCLUDE_ALL_METADATA` and `INCLUDE_ALL_METADATA`.
+  Possible values are: `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`.
 
 ## Attributes Reference
 
@@ -287,7 +286,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

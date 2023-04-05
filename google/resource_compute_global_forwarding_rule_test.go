@@ -11,17 +11,17 @@ import (
 func TestAccComputeGlobalForwardingRule_updateTarget(t *testing.T) {
 	t.Parallel()
 
-	fr := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	proxy := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	proxyUpdated := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	backend := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	hc := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	urlmap := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
+	fr := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	proxy := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	proxyUpdated := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	backend := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	hc := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	urlmap := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
 
-	vcrTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckComputeGlobalForwardingRuleDestroyProducer(t),
+	VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckComputeGlobalForwardingRuleDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccComputeGlobalForwardingRule_httpProxy(fr, "proxy", proxy, proxyUpdated, backend, hc, urlmap),
@@ -56,16 +56,16 @@ func TestAccComputeGlobalForwardingRule_updateTarget(t *testing.T) {
 func TestAccComputeGlobalForwardingRule_ipv6(t *testing.T) {
 	t.Parallel()
 
-	fr := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	proxy := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	backend := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	hc := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
-	urlmap := fmt.Sprintf("forwardrule-test-%s", randString(t, 10))
+	fr := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	proxy := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	backend := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	hc := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
+	urlmap := fmt.Sprintf("forwardrule-test-%s", RandString(t, 10))
 
-	vcrTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckComputeGlobalForwardingRuleDestroyProducer(t),
+	VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckComputeGlobalForwardingRuleDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccComputeGlobalForwardingRule_ipv6(fr, proxy, backend, hc, urlmap),

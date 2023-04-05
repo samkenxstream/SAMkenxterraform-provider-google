@@ -14,7 +14,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_region_network_firewall_policy_rule"
 description: |-
   The Compute NetworkFirewallPolicyRule resource
 ---
@@ -42,7 +41,7 @@ resource "google_compute_region_network_firewall_policy_rule" "primary" {
   priority                = 1000
   region                  = "us-west1"
   rule_name               = "test-rule"
-  target_service_accounts = ["emailAddress:my@service-account.com"]
+  target_service_accounts = ["my@service-account.com"]
 
   match {
     src_ip_ranges = ["10.100.0.1/32"]
@@ -203,7 +202,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

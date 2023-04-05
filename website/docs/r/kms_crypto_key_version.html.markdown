@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Key Management Service"
-page_title: "Google: google_kms_crypto_key_version"
 description: |-
   A `CryptoKeyVersion` represents an individual cryptographic key, and the associated key material.
 ---
@@ -69,7 +68,7 @@ The following arguments are supported:
 * `state` -
   (Optional)
   The current state of the CryptoKeyVersion.
-  Possible values are `PENDING_GENERATION`, `ENABLED`, `DISABLED`, `DESTROYED`, `DESTROY_SCHEDULED`, `PENDING_IMPORT`, and `IMPORT_FAILED`.
+  Possible values are: `PENDING_GENERATION`, `ENABLED`, `DISABLED`, `DESTROYED`, `DESTROY_SCHEDULED`, `PENDING_IMPORT`, `IMPORT_FAILED`.
 
 
 ## Attributes Reference
@@ -99,9 +98,11 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_attestation"></a>The `attestation` block contains:
 
 * `format` -
+  (Output)
   The format of the attestation data.
 
 * `content` -
+  (Output)
   The attestation data provided by the HSM when the key operation was performed.
 
 * `cert_chains` -
@@ -142,7 +143,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

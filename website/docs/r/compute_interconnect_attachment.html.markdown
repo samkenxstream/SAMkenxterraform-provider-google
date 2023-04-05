@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_interconnect_attachment"
 description: |-
   Represents an InterconnectAttachment (VLAN attachment) resource.
 ---
@@ -151,7 +150,7 @@ The following arguments are supported:
   For attachments of type PARTNER, the Google Partner that is operating the interconnect must set the bandwidth.
   Output only for PARTNER type, mutable for PARTNER_PROVIDER and DEDICATED,
   Defaults to BPS_10G
-  Possible values are `BPS_50M`, `BPS_100M`, `BPS_200M`, `BPS_300M`, `BPS_400M`, `BPS_500M`, `BPS_1G`, `BPS_2G`, `BPS_5G`, `BPS_10G`, `BPS_20G`, and `BPS_50G`.
+  Possible values are: `BPS_50M`, `BPS_100M`, `BPS_200M`, `BPS_300M`, `BPS_400M`, `BPS_500M`, `BPS_1G`, `BPS_2G`, `BPS_5G`, `BPS_10G`, `BPS_20G`, `BPS_50G`.
 
 * `edge_availability_domain` -
   (Optional)
@@ -166,7 +165,7 @@ The following arguments are supported:
   (Optional)
   The type of InterconnectAttachment you wish to create. Defaults to
   DEDICATED.
-  Possible values are `DEDICATED`, `PARTNER`, and `PARTNER_PROVIDER`.
+  Possible values are: `DEDICATED`, `PARTNER`, `PARTNER_PROVIDER`.
 
 * `candidate_subnets` -
   (Optional)
@@ -185,38 +184,37 @@ The following arguments are supported:
 
 * `ipsec_internal_addresses` -
   (Optional)
-  URL of addresses that have been reserved for the interconnect
-  attachment, Used only for interconnect attachment that has the
-  encryption option as IPSEC.
-  The addresses must be RFC 1918 IP address ranges. When creating HA
-  VPN gateway over the interconnect attachment, if the attachment is
-  configured to use an RFC 1918 IP address, then the VPN gateway's IP
-  address will be allocated from the IP address range specified
-  here.
+  URL of addresses that have been reserved for the interconnect attachment,
+  Used only for interconnect attachment that has the encryption option as
+  IPSEC.
+  The addresses must be RFC 1918 IP address ranges. When creating HA VPN
+  gateway over the interconnect attachment, if the attachment is configured
+  to use an RFC 1918 IP address, then the VPN gateway's IP address will be
+  allocated from the IP address range specified here.
   For example, if the HA VPN gateway's interface 0 is paired to this
-  interconnect attachment, then an RFC 1918 IP address for the VPN
-  gateway interface 0 will be allocated from the IP address specified
-  for this interconnect attachment.
+  interconnect attachment, then an RFC 1918 IP address for the VPN gateway
+  interface 0 will be allocated from the IP address specified for this
+  interconnect attachment.
   If this field is not specified for interconnect attachment that has
-  encryption option as IPSEC, later on when creating HA VPN gateway on
-  this interconnect attachment, the HA VPN gateway's IP address will be
+  encryption option as IPSEC, later on when creating HA VPN gateway on this
+  interconnect attachment, the HA VPN gateway's IP address will be
   allocated from regional external IP address pool.
 
 * `encryption` -
   (Optional)
   Indicates the user-supplied encryption option of this interconnect
-  attachment:
-  NONE is the default value, which means that the attachment carries
-  unencrypted traffic. VMs can send traffic to, or receive traffic
-  from, this type of attachment.
-  IPSEC indicates that the attachment carries only traffic encrypted by
-  an IPsec device such as an HA VPN gateway. VMs cannot directly send
-  traffic to, or receive traffic from, such an attachment. To use
-  IPsec-encrypted Cloud Interconnect create the attachment using this
-  option.
-  Not currently available publicly.
+  attachment. Can only be specified at attachment creation for PARTNER or
+  DEDICATED attachments.
+  * NONE - This is the default value, which means that the VLAN attachment
+  carries unencrypted traffic. VMs are able to send traffic to, or receive
+  traffic from, such a VLAN attachment.
+  * IPSEC - The VLAN attachment carries only encrypted traffic that is
+  encrypted by an IPsec device, such as an HA VPN gateway or third-party
+  IPsec VPN. VMs cannot directly send traffic to, or receive traffic from,
+  such a VLAN attachment. To use HA VPN over Cloud Interconnect, the VLAN
+  attachment must be created with this option.
   Default value is `NONE`.
-  Possible values are `NONE` and `IPSEC`.
+  Possible values are: `NONE`, `IPSEC`.
 
 * `region` -
   (Optional)
@@ -270,13 +268,14 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_private_interconnect_info"></a>The `private_interconnect_info` block contains:
 
 * `tag8021q` -
+  (Output)
   802.1q encapsulation tag to be used for traffic between
   Google and the customer, going to and from this network and region.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

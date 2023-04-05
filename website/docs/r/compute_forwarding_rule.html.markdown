@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_forwarding_rule"
 description: |-
   A ForwardingRule resource.
 ---
@@ -1012,7 +1011,7 @@ resource "google_compute_subnetwork" "proxy" {
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
 </div>
-## Example Usage - Forwarding Rule VPC Psc
+## Example Usage - Forwarding Rule Vpc Psc
 
 
 ```hcl
@@ -1180,7 +1179,7 @@ The following arguments are supported:
   The IP protocol to which this rule applies.
   When the load balancing scheme is INTERNAL, only TCP and UDP are
   valid.
-  Possible values are `TCP`, `UDP`, `ESP`, `AH`, `SCTP`, `ICMP`, and `L3_DEFAULT`.
+  Possible values are: `TCP`, `UDP`, `ESP`, `AH`, `SCTP`, `ICMP`, `L3_DEFAULT`.
 
 * `backend_service` -
   (Optional)
@@ -1200,7 +1199,7 @@ The following arguments are supported:
   ([Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html) only) Note: This field must be set to ""
   if the target is an URI of a service attachment.
   Default value is `EXTERNAL`.
-  Possible values are `EXTERNAL`, `EXTERNAL_MANAGED`, `INTERNAL`, and `INTERNAL_MANAGED`.
+  Possible values are: `EXTERNAL`, `EXTERNAL_MANAGED`, `INTERNAL`, `INTERNAL_MANAGED`.
 
 * `network` -
   (Optional)
@@ -1278,7 +1277,7 @@ The following arguments are supported:
   (Optional)
   The networking tier used for configuring this address. If this field is not
   specified, it is assumed to be PREMIUM.
-  Possible values are `PREMIUM` and `STANDARD`.
+  Possible values are: `PREMIUM`, `STANDARD`.
 
 * `service_directory_registrations` -
   (Optional)
@@ -1347,7 +1346,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

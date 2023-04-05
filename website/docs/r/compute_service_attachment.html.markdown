@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_service_attachment"
 description: |-
   Represents a ServiceAttachment resource.
 ---
@@ -152,7 +151,6 @@ resource "google_compute_address" "psc_ilb_consumer_address" {
 
   subnetwork   = "default"
   address_type = "INTERNAL"
-  address      = "10.168.1.17"
 }
 
 resource "google_compute_forwarding_rule" "psc_ilb_consumer" {
@@ -315,16 +313,18 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_connected_endpoints"></a>The `connected_endpoints` block contains:
 
 * `endpoint` -
+  (Output)
   The URL of the consumer forwarding rule.
 
 * `status` -
+  (Output)
   The status of the connection from the consumer forwarding rule to
   this service attachment.
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

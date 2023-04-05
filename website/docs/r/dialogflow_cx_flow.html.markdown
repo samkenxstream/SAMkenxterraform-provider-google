@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Dialogflow CX"
-page_title: "Google: google_dialogflow_cx_flow"
 description: |-
   Flows represents the conversation flows when you build your chatbot agent.
 ---
@@ -168,6 +167,7 @@ The following arguments are supported:
 <a name="nested_transition_routes"></a>The `transition_routes` block supports:
 
 * `name` -
+  (Output)
   The unique identifier of this transition route.
 
 * `intent` -
@@ -231,11 +231,13 @@ The following arguments are supported:
   A collection of text responses.
 
 * `allow_playback_interruption` -
+  (Output)
   Whether the playback of this message can be interrupted by the end user's speech and the client can then starts the next Dialogflow request.
 
 <a name="nested_event_handlers"></a>The `event_handlers` block supports:
 
 * `name` -
+  (Output)
   The unique identifier of this event handler.
 
 * `event` -
@@ -293,6 +295,7 @@ The following arguments are supported:
   A collection of text responses.
 
 * `allow_playback_interruption` -
+  (Output)
   Whether the playback of this message can be interrupted by the end user's speech and the client can then starts the next Dialogflow request.
 
 <a name="nested_nlu_settings"></a>The `nlu_settings` block supports:
@@ -302,7 +305,7 @@ The following arguments are supported:
   Indicates the type of NLU model.
   * MODEL_TYPE_STANDARD: Use standard NLU model.
   * MODEL_TYPE_ADVANCED: Use advanced NLU model.
-  Possible values are `MODEL_TYPE_STANDARD` and `MODEL_TYPE_ADVANCED`.
+  Possible values are: `MODEL_TYPE_STANDARD`, `MODEL_TYPE_ADVANCED`.
 
 * `classification_threshold` -
   (Optional)
@@ -314,7 +317,7 @@ The following arguments are supported:
   Indicates NLU model training mode.
   * MODEL_TRAINING_MODE_AUTOMATIC: NLU model training is automatically triggered when a flow gets modified. User can also manually trigger model training in this mode.
   * MODEL_TRAINING_MODE_MANUAL: User needs to manually trigger NLU model training. Best for large flows whose models take long time to train.
-  Possible values are `MODEL_TRAINING_MODE_AUTOMATIC` and `MODEL_TRAINING_MODE_MANUAL`.
+  Possible values are: `MODEL_TRAINING_MODE_AUTOMATIC`, `MODEL_TRAINING_MODE_MANUAL`.
 
 ## Attributes Reference
 
@@ -330,7 +333,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 40 minutes.
 - `update` - Default is 40 minutes.

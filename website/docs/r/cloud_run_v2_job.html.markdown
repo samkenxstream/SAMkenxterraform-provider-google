@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Run (v2 API)"
-page_title: "Google: google_cloud_run_v2_job"
 description: |-
   A Cloud Run Job resource that references a container image which is run to completion.
 ---
@@ -49,6 +48,12 @@ resource "google_cloud_run_v2_job" "default" {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      launch_stage,
+    ]
   }
 }
 ```
@@ -97,6 +102,12 @@ resource "google_cloud_run_v2_job" "default" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      launch_stage,
+    ]
   }
 }
 
@@ -158,6 +169,12 @@ resource "google_cloud_run_v2_job" "default" {
       }
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      launch_stage,
+    ]
+  }
 }
 
 resource "google_vpc_access_connector" "connector" {
@@ -217,6 +234,12 @@ resource "google_cloud_run_v2_job" "default" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      launch_stage,
+    ]
   }
 }
 
@@ -302,7 +325,7 @@ The following arguments are supported:
 * `execution_environment` -
   (Optional)
   The execution environment being used to host this Task.
-  Possible values are `EXECUTION_ENVIRONMENT_GEN1` and `EXECUTION_ENVIRONMENT_GEN2`.
+  Possible values are: `EXECUTION_ENVIRONMENT_GEN1`, `EXECUTION_ENVIRONMENT_GEN2`.
 
 * `encryption_key` -
   (Optional)
@@ -610,7 +633,7 @@ The following arguments are supported:
 * `egress` -
   (Optional)
   Traffic VPC egress settings.
-  Possible values are `ALL_TRAFFIC` and `PRIVATE_RANGES_ONLY`.
+  Possible values are: `ALL_TRAFFIC`, `PRIVATE_RANGES_ONLY`.
 
 - - -
 
@@ -630,7 +653,7 @@ The following arguments are supported:
 * `launch_stage` -
   (Optional)
   The launch stage as defined by Google Cloud Platform Launch Stages. Cloud Run supports ALPHA, BETA, and GA. If no value is specified, GA is assumed.
-  Possible values are `UNIMPLEMENTED`, `PRELAUNCH`, `EARLY_ACCESS`, `ALPHA`, `BETA`, `GA`, and `DEPRECATED`.
+  Possible values are: `UNIMPLEMENTED`, `PRELAUNCH`, `EARLY_ACCESS`, `ALPHA`, `BETA`, `GA`, `DEPRECATED`.
 
 * `binary_authorization` -
   (Optional)
@@ -698,74 +721,93 @@ In addition to the arguments listed above, the following computed attributes are
 <a name="nested_terminal_condition"></a>The `terminal_condition` block contains:
 
 * `type` -
+  (Output)
   type is used to communicate the status of the reconciliation process. See also: https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting Types common to all resources include: * "Ready": True when the Resource is ready.
 
 * `state` -
+  (Output)
   State of the condition.
 
 * `message` -
+  (Output)
   Human readable message indicating details about the current status.
 
 * `last_transition_time` -
+  (Output)
   Last time the condition transitioned from one status to another.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
 * `severity` -
+  (Output)
   How to interpret failures of this condition, one of Error, Warning, Info
 
 * `reason` -
+  (Output)
   A common (service-level) reason for this condition.
 
 * `revision_reason` -
+  (Output)
   A reason for the revision condition.
 
 * `execution_reason` -
+  (Output)
   A reason for the execution condition.
 
 <a name="nested_conditions"></a>The `conditions` block contains:
 
 * `type` -
+  (Output)
   type is used to communicate the status of the reconciliation process. See also: https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting Types common to all resources include: * "Ready": True when the Resource is ready.
 
 * `state` -
+  (Output)
   State of the condition.
 
 * `message` -
+  (Output)
   Human readable message indicating details about the current status.
 
 * `last_transition_time` -
+  (Output)
   Last time the condition transitioned from one status to another.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
 * `severity` -
+  (Output)
   How to interpret failures of this condition, one of Error, Warning, Info
 
 * `reason` -
+  (Output)
   A common (service-level) reason for this condition.
 
 * `revision_reason` -
+  (Output)
   A reason for the revision condition.
 
 * `execution_reason` -
+  (Output)
   A reason for the execution condition.
 
 <a name="nested_latest_created_execution"></a>The `latest_created_execution` block contains:
 
 * `name` -
+  (Output)
   Name of the execution.
 
 * `create_time` -
+  (Output)
   Creation timestamp of the execution.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
 * `completion_time` -
+  (Output)
   Completion timestamp of the execution.
   A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

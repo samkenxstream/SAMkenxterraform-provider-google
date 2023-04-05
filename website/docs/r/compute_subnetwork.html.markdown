@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_subnetwork"
 description: |-
   A VPC network is a virtual version of the traditional physical networks
   that exist within and between physical data centers.
@@ -224,19 +223,20 @@ The following arguments are supported:
 
 * `purpose` -
   (Optional)
-  The purpose of the resource. A subnetwork with purpose set to
-  INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is
-  reserved for Internal HTTP(S) Load Balancing.
-  If set to INTERNAL_HTTPS_LOAD_BALANCER you must also set the `role` field.
+  The purpose of the resource. This field can be either `PRIVATE_RFC_1918`, `INTERNAL_HTTPS_LOAD_BALANCER` or `REGIONAL_MANAGED_PROXY`.
+  A subnetwork with purpose set to `INTERNAL_HTTPS_LOAD_BALANCER` is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing.
+  A subnetwork in a given region with purpose set to `REGIONAL_MANAGED_PROXY` is a proxy-only subnet and is shared between all the regional Envoy-based load balancers.
+  If unspecified, the purpose defaults to `PRIVATE_RFC_1918`.
+  The enableFlowLogs field isn't supported with the purpose field set to `INTERNAL_HTTPS_LOAD_BALANCER`.
 
 * `role` -
   (Optional)
-  The role of subnetwork. Currently, this field is only used when
-  purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE
-  or BACKUP. An ACTIVE subnetwork is one that is currently being used
-  for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that
-  is ready to be promoted to ACTIVE or is currently draining.
-  Possible values are `ACTIVE` and `BACKUP`.
+  The role of subnetwork.
+  The value can be set to `ACTIVE` or `BACKUP`.
+  An `ACTIVE` subnetwork is one that is currently being used.
+  A `BACKUP` subnetwork is one that is ready to be promoted to `ACTIVE` or is currently draining.
+  Subnetwork role must be specified when purpose is set to `INTERNAL_HTTPS_LOAD_BALANCER` or `REGIONAL_MANAGED_PROXY`.
+  Possible values are: `ACTIVE`, `BACKUP`.
 
 * `secondary_ip_range` -
   (Optional)
@@ -275,14 +275,14 @@ The following arguments are supported:
   (Optional)
   The stack type for this subnet to identify whether the IPv6 feature is enabled or not.
   If not specified IPV4_ONLY will be used.
-  Possible values are `IPV4_ONLY` and `IPV4_IPV6`.
+  Possible values are: `IPV4_ONLY`, `IPV4_IPV6`.
 
 * `ipv6_access_type` -
   (Optional)
   The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation
   or the first time the subnet is updated into IPV4_IPV6 dual stack. If the ipv6_type is EXTERNAL then this subnet
   cannot enable direct path.
-  Possible values are `EXTERNAL` and `INTERNAL`.
+  Possible values are: `EXTERNAL`, `INTERNAL`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -313,7 +313,7 @@ The following arguments are supported:
   interval time will reduce the amount of generated flow logs for long
   lasting connections. Default is an interval of 5 seconds per connection.
   Default value is `INTERVAL_5_SEC`.
-  Possible values are `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, and `INTERVAL_15_MIN`.
+  Possible values are: `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, `INTERVAL_15_MIN`.
 
 * `flow_sampling` -
   (Optional)
@@ -329,7 +329,7 @@ The following arguments are supported:
   Configures whether metadata fields should be added to the reported VPC
   flow logs.
   Default value is `INCLUDE_ALL_METADATA`.
-  Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
+  Possible values are: `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, `CUSTOM_METADATA`.
 
 * `metadata_fields` -
   (Optional)
@@ -366,7 +366,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

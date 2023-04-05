@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Healthcare"
-page_title: "Google: google_healthcare_fhir_store"
 description: |-
   A FhirStore is a datastore inside a Healthcare dataset that conforms to the FHIR (https://www.
 ---
@@ -141,17 +140,57 @@ resource "google_healthcare_fhir_store" "default" {
     label1 = "labelvalue1"
   }
 
+  notification_config {
+    pubsub_topic = "${google_pubsub_topic.topic.id}"
+  }
+}
+
+resource "google_pubsub_topic" "topic" {
+  name = "fhir-notifications"
+}
+
+resource "google_healthcare_dataset" "dataset" {
+  name     = "example-dataset"
+  location = "us-central1"
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=healthcare_fhir_store_notification_configs&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Healthcare Fhir Store Notification Configs
+
+
+```hcl
+resource "google_healthcare_fhir_store" "default" {
+  provider = google-beta
+  name     = "example-fhir-store"
+  dataset  = google_healthcare_dataset.dataset.id
+  version  = "R4"
+
+  enable_update_create          = false
+  disable_referential_integrity = false
+  disable_resource_versioning   = false
+  enable_history_import         = false
+
+  labels = {
+    label1 = "labelvalue1"
+  }
+
   notification_configs {
-    pubsub_topic = "${google_pubsub_topic.topic.id}" 
+    pubsub_topic       = "${google_pubsub_topic.topic.id}"
     send_full_resource = true
   }
 }
 
 resource "google_pubsub_topic" "topic" {
+  provider = google-beta
   name     = "fhir-notifications"
 }
 
 resource "google_healthcare_dataset" "dataset" {
+  provider = google-beta
   name     = "example-dataset"
   location = "us-central1"
 }
@@ -180,7 +219,7 @@ The following arguments are supported:
   (Optional)
   The FHIR specification version.
   Default value is `STU3`.
-  Possible values are `DSTU2`, `STU3`, and `R4`.
+  Possible values are: `DSTU2`, `STU3`, `R4`.
 
 * `enable_update_create` -
   (Optional)
@@ -301,7 +340,7 @@ The following arguments are supported:
    * ANALYTICS_V2: Analytics V2, similar to schema defined by the FHIR community, with added support for extensions with one or more occurrences and contained resources in stringified JSON.
    * LOSSLESS: A data-driven schema generated from the fields present in the FHIR data being exported, with no additional simplification.
   Default value is `ANALYTICS`.
-  Possible values are `ANALYTICS`, `ANALYTICS_V2`, and `LOSSLESS`.
+  Possible values are: `ANALYTICS`, `ANALYTICS_V2`, `LOSSLESS`.
 
 * `recursive_structure_depth` -
   (Required)
@@ -342,7 +381,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

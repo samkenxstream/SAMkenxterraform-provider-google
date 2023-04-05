@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Dialogflow CX"
-page_title: "Google: google_dialogflow_cx_intent"
 description: |-
   An intent represents a user's intent to interact with a conversational agent.
 ---
@@ -146,6 +145,7 @@ The following arguments are supported:
 <a name="nested_training_phrases"></a>The `training_phrases` block supports:
 
 * `id` -
+  (Output)
   The unique identifier of the training phrase.
 
 * `parts` -
@@ -208,7 +208,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 40 minutes.
 - `update` - Default is 40 minutes.

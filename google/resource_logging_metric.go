@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceLoggingMetric() *schema.Resource {
+func ResourceLoggingMetric() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceLoggingMetricCreate,
 		Read:   resourceLoggingMetricRead,
@@ -158,6 +158,11 @@ Each bucket represents a constant absolute uncertainty on the specific value in 
 				Description: `A description of this metric, which is used in documentation. The maximum length of the
 description is 8000 characters.`,
 			},
+			"disabled": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: `If set to True, then this metric is disabled and it does not generate any points.`,
+			},
 			"label_extractors": {
 				Type:     schema.TypeMap,
 				Optional: true,
@@ -272,7 +277,7 @@ func loggingMetricMetricDescriptorLabelsSchema() *schema.Resource {
 
 func resourceLoggingMetricCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -295,6 +300,12 @@ func resourceLoggingMetricCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	} else if v, ok := d.GetOkExists("bucket_name"); !isEmptyValue(reflect.ValueOf(bucketNameProp)) && (ok || !reflect.DeepEqual(v, bucketNameProp)) {
 		obj["bucketName"] = bucketNameProp
+	}
+	disabledProp, err := expandLoggingMetricDisabled(d.Get("disabled"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("disabled"); !isEmptyValue(reflect.ValueOf(disabledProp)) && (ok || !reflect.DeepEqual(v, disabledProp)) {
+		obj["disabled"] = disabledProp
 	}
 	filterProp, err := expandLoggingMetricFilter(d.Get("filter"), d, config)
 	if err != nil {
@@ -353,7 +364,7 @@ func resourceLoggingMetricCreate(d *schema.ResourceData, meta interface{}) error
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
+	res, err := SendRequestWithTimeout(config, "POST", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutCreate))
 	if err != nil {
 		return fmt.Errorf("Error creating Metric: %s", err)
 	}
@@ -390,7 +401,7 @@ func resourceLoggingMetricCreate(d *schema.ResourceData, meta interface{}) error
 
 func resourceLoggingMetricRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -413,7 +424,7 @@ func resourceLoggingMetricRead(d *schema.ResourceData, meta interface{}) error {
 		billingProject = bp
 	}
 
-	res, err := sendRequest(config, "GET", billingProject, url, userAgent, nil)
+	res, err := SendRequest(config, "GET", billingProject, url, userAgent, nil)
 	if err != nil {
 		return handleNotFoundError(err, d, fmt.Sprintf("LoggingMetric %q", d.Id()))
 	}
@@ -429,6 +440,9 @@ func resourceLoggingMetricRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading Metric: %s", err)
 	}
 	if err := d.Set("bucket_name", flattenLoggingMetricBucketName(res["bucketName"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Metric: %s", err)
+	}
+	if err := d.Set("disabled", flattenLoggingMetricDisabled(res["disabled"], d, config)); err != nil {
 		return fmt.Errorf("Error reading Metric: %s", err)
 	}
 	if err := d.Set("filter", flattenLoggingMetricFilter(res["filter"], d, config)); err != nil {
@@ -452,7 +466,7 @@ func resourceLoggingMetricRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceLoggingMetricUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -483,6 +497,12 @@ func resourceLoggingMetricUpdate(d *schema.ResourceData, meta interface{}) error
 		return err
 	} else if v, ok := d.GetOkExists("bucket_name"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, bucketNameProp)) {
 		obj["bucketName"] = bucketNameProp
+	}
+	disabledProp, err := expandLoggingMetricDisabled(d.Get("disabled"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("disabled"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, disabledProp)) {
+		obj["disabled"] = disabledProp
 	}
 	filterProp, err := expandLoggingMetricFilter(d.Get("filter"), d, config)
 	if err != nil {
@@ -534,7 +554,7 @@ func resourceLoggingMetricUpdate(d *schema.ResourceData, meta interface{}) error
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "PUT", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
+	res, err := SendRequestWithTimeout(config, "PUT", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutUpdate))
 
 	if err != nil {
 		return fmt.Errorf("Error updating Metric %q: %s", d.Id(), err)
@@ -547,7 +567,7 @@ func resourceLoggingMetricUpdate(d *schema.ResourceData, meta interface{}) error
 
 func resourceLoggingMetricDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	userAgent, err := generateUserAgentString(d, config.userAgent)
+	userAgent, err := generateUserAgentString(d, config.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -580,7 +600,7 @@ func resourceLoggingMetricDelete(d *schema.ResourceData, meta interface{}) error
 		billingProject = bp
 	}
 
-	res, err := sendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
+	res, err := SendRequestWithTimeout(config, "DELETE", billingProject, url, userAgent, obj, d.Timeout(schema.TimeoutDelete))
 	if err != nil {
 		return handleNotFoundError(err, d, "Metric")
 	}
@@ -610,6 +630,10 @@ func flattenLoggingMetricDescription(v interface{}, d *schema.ResourceData, conf
 }
 
 func flattenLoggingMetricBucketName(v interface{}, d *schema.ResourceData, config *Config) interface{} {
+	return v
+}
+
+func flattenLoggingMetricDisabled(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	return v
 }
 
@@ -735,7 +759,7 @@ func flattenLoggingMetricBucketOptionsLinearBuckets(v interface{}, d *schema.Res
 func flattenLoggingMetricBucketOptionsLinearBucketsNumFiniteBuckets(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -777,7 +801,7 @@ func flattenLoggingMetricBucketOptionsExponentialBuckets(v interface{}, d *schem
 func flattenLoggingMetricBucketOptionsExponentialBucketsNumFiniteBuckets(v interface{}, d *schema.ResourceData, config *Config) interface{} {
 	// Handles the string fixed64 format
 	if strVal, ok := v.(string); ok {
-		if intVal, err := stringToFixed64(strVal); err == nil {
+		if intVal, err := StringToFixed64(strVal); err == nil {
 			return intVal
 		}
 	}
@@ -825,6 +849,10 @@ func expandLoggingMetricDescription(v interface{}, d TerraformResourceData, conf
 }
 
 func expandLoggingMetricBucketName(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandLoggingMetricDisabled(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 

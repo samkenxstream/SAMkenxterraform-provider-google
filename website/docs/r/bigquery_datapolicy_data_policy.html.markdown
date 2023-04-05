@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BigQuery Data Policy"
-page_title: "Google: google_bigquery_datapolicy_data_policy"
 description: |-
   A BigQuery Data Policy
 ---
@@ -22,8 +21,6 @@ description: |-
 
 A BigQuery Data Policy
 
-~> **Warning:** This resource is in beta, and should be used with the terraform-provider-google-beta provider.
-See [Provider Versions](https://terraform.io/docs/providers/google/guides/provider_versions.html) for more details on beta resources.
 
 To get more information about DataPolicy, see:
 
@@ -41,7 +38,6 @@ To get more information about DataPolicy, see:
 
 ```hcl
 resource "google_bigquery_datapolicy_data_policy" "data_policy" {
-    provider = google-beta
     location         = "us-central1"
     data_policy_id   = "data_policy"
     policy_tag       = google_data_catalog_policy_tag.policy_tag.name
@@ -49,14 +45,12 @@ resource "google_bigquery_datapolicy_data_policy" "data_policy" {
   }
 
   resource "google_data_catalog_policy_tag" "policy_tag" {
-    provider = google-beta
     taxonomy     = google_data_catalog_taxonomy.taxonomy.id
     display_name = "Low security"
     description  = "A policy tag normally associated with low security items"
   }
   
   resource "google_data_catalog_taxonomy" "taxonomy" {
-    provider = google-beta
     region                 = "us-central1"
     display_name           = "taxonomy"
     description            = "A collection of policy tags"
@@ -84,7 +78,7 @@ The following arguments are supported:
 * `data_policy_type` -
   (Required)
   The enrollment level of the service.
-  Possible values are `COLUMN_LEVEL_SECURITY_POLICY` and `DATA_MASKING_POLICY`.
+  Possible values are: `COLUMN_LEVEL_SECURITY_POLICY`, `DATA_MASKING_POLICY`.
 
 
 - - -
@@ -104,7 +98,7 @@ The following arguments are supported:
 * `predefined_expression` -
   (Required)
   The available masking rules. Learn more here: https://cloud.google.com/bigquery/docs/column-data-masking-intro#masking_options.
-  Possible values are `SHA256`, `ALWAYS_NULL`, and `DEFAULT_MASKING_VALUE`.
+  Possible values are: `SHA256`, `ALWAYS_NULL`, `DEFAULT_MASKING_VALUE`, `LAST_FOUR_CHARACTERS`, `FIRST_FOUR_CHARACTERS`, `EMAIL_MASK`, `DATE_YEAR_MASK`.
 
 ## Attributes Reference
 
@@ -119,7 +113,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

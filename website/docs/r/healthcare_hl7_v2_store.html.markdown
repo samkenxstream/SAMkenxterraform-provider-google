@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Cloud Healthcare"
-page_title: "Google: google_healthcare_hl7_v2_store"
 description: |-
   A Hl7V2Store is a datastore inside a Healthcare dataset that conforms to the FHIR (https://www.
 ---
@@ -263,7 +262,7 @@ The following arguments are supported:
   (Optional)
   The version of the unschematized parser to be used when a custom `schema` is not set.
   Default value is `V1`.
-  Possible values are `V1`, `V2`, and `V3`.
+  Possible values are: `V1`, `V2`, `V3`.
 
 <a name="nested_notification_configs"></a>The `notification_configs` block supports:
 
@@ -313,7 +312,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

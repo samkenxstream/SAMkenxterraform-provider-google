@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_managed_ssl_certificate"
 description: |-
   An SslCertificate resource, used for HTTPS load balancing.
 ---
@@ -227,7 +226,7 @@ The following arguments are supported:
   Enum field whose value is always `MANAGED` - used to signal to the API
   which type this is.
   Default value is `MANAGED`.
-  Possible values are `MANAGED`.
+  Possible values are: `MANAGED`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -263,7 +262,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 30 minutes.
 - `delete` - Default is 30 minutes.

@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Access Context Manager (VPC Service Controls)"
-page_title: "Google: google_access_context_manager_service_perimeters"
 description: |-
   Replace all existing Service Perimeters in an Access Policy with the Service Perimeters provided.
 ---
@@ -120,9 +119,11 @@ The following arguments are supported:
   behavior.
 
 * `create_time` -
+  (Output)
   Time the AccessPolicy was created in UTC.
 
 * `update_time` -
+  (Output)
   Time the AccessPolicy was updated in UTC.
 
 * `perimeter_type` -
@@ -142,7 +143,7 @@ The following arguments are supported:
   with a common perimeter, but should not be able to share data among
   themselves.
   Default value is `PERIMETER_TYPE_REGULAR`.
-  Possible values are `PERIMETER_TYPE_REGULAR` and `PERIMETER_TYPE_BRIDGE`.
+  Possible values are: `PERIMETER_TYPE_REGULAR`, `PERIMETER_TYPE_BRIDGE`.
 
 * `status` -
   (Optional)
@@ -257,7 +258,7 @@ The following arguments are supported:
   Specifies the type of identities that are allowed access from outside the 
   perimeter. If left unspecified, then members of `identities` field will be 
   allowed access.
-  Possible values are `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, and `ANY_SERVICE_ACCOUNT`.
+  Possible values are: `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, `ANY_SERVICE_ACCOUNT`.
 
 * `identities` -
   (Optional)
@@ -364,7 +365,7 @@ The following arguments are supported:
   Specifies the type of identities that are allowed access to outside the 
   perimeter. If left unspecified, then members of `identities` field will 
   be allowed access.
-  Possible values are `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, and `ANY_SERVICE_ACCOUNT`.
+  Possible values are: `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, `ANY_SERVICE_ACCOUNT`.
 
 * `identities` -
   (Optional)
@@ -510,7 +511,7 @@ The following arguments are supported:
   Specifies the type of identities that are allowed access from outside the 
   perimeter. If left unspecified, then members of `identities` field will be 
   allowed access.
-  Possible values are `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, and `ANY_SERVICE_ACCOUNT`.
+  Possible values are: `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, `ANY_SERVICE_ACCOUNT`.
 
 * `identities` -
   (Optional)
@@ -617,7 +618,7 @@ The following arguments are supported:
   Specifies the type of identities that are allowed access to outside the 
   perimeter. If left unspecified, then members of `identities` field will 
   be allowed access.
-  Possible values are `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, and `ANY_SERVICE_ACCOUNT`.
+  Possible values are: `IDENTITY_TYPE_UNSPECIFIED`, `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, `ANY_SERVICE_ACCOUNT`.
 
 * `identities` -
   (Optional)
@@ -688,7 +689,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

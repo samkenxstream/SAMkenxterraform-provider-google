@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Artifact Registry"
-page_title: "Google: google_artifact_registry_repository"
 description: |-
   A repository for storing artifacts
 ---
@@ -46,6 +45,26 @@ resource "google_artifact_registry_repository" "my-repo" {
 }
 ```
 <div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=artifact_registry_repository_docker&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Artifact Registry Repository Docker
+
+
+```hcl
+resource "google_artifact_registry_repository" "my-repo" {
+  location      = "us-central1"
+  repository_id = "my-repository"
+  description   = "example docker repository"
+  format        = "DOCKER"
+
+  docker_config {
+    immutable_tags = true
+  }
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
   <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=artifact_registry_repository_cmek&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
     <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
   </a>
@@ -72,6 +91,61 @@ resource "google_kms_crypto_key_iam_member" "crypto_key" {
 }
 
 data "google_project" "project" {}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=artifact_registry_repository_virtual&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Artifact Registry Repository Virtual
+
+
+```hcl
+resource "google_artifact_registry_repository" "my-repo-upstream" {
+  location      = "us-central1"
+  repository_id = "my-repository-upstream"
+  description   = "example docker repository (upstream source)"
+  format        = "DOCKER"
+}
+
+resource "google_artifact_registry_repository" "my-repo" {
+  depends_on    = []
+  location      = "us-central1"
+  repository_id = "my-repository"
+  description   = "example virtual docker repository"
+  format        = "DOCKER"
+  mode          = "VIRTUAL_REPOSITORY"
+  virtual_repository_config {
+    upstream_policies {
+      id          = "my-repository-upstream"
+      repository  = google_artifact_registry_repository.my-repo-upstream.id
+      priority    = 1
+    }
+  }
+}
+```
+<div class = "oics-button" style="float: right; margin: 0 0 -15px">
+  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=artifact_registry_repository_remote&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
+    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
+  </a>
+</div>
+## Example Usage - Artifact Registry Repository Remote
+
+
+```hcl
+resource "google_artifact_registry_repository" "my-repo" {
+  location      = "us-central1"
+  repository_id = "my-repository"
+  description   = "example remote docker repository"
+  format        = "DOCKER"
+  mode          = "REMOTE_REPOSITORY"
+  remote_repository_config {
+    description = "docker hub"
+    docker_repository {
+      public_repository = "DOCKER_HUB"
+    }
+  }
+}
 ```
 
 ## Argument Reference
@@ -118,6 +192,11 @@ The following arguments are supported:
   `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`.
   This value may not be changed after the Repository has been created.
 
+* `docker_config` -
+  (Optional)
+  Docker repository config contains repository level configuration for the repositories of docker type.
+  Structure is [documented below](#nested_docker_config).
+
 * `maven_config` -
   (Optional)
   MavenRepositoryConfig is maven related repository details.
@@ -125,9 +204,31 @@ The following arguments are supported:
   format type.
   Structure is [documented below](#nested_maven_config).
 
+* `mode` -
+  (Optional)
+  The mode configures the repository to serve artifacts from different sources.
+  Default value is `STANDARD_REPOSITORY`.
+  Possible values are: `STANDARD_REPOSITORY`, `VIRTUAL_REPOSITORY`, `REMOTE_REPOSITORY`.
+
+* `virtual_repository_config` -
+  (Optional)
+  Configuration specific for a Virtual Repository.
+  Structure is [documented below](#nested_virtual_repository_config).
+
+* `remote_repository_config` -
+  (Optional)
+  Configuration specific for a Remote Repository.
+  Structure is [documented below](#nested_remote_repository_config).
+
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
 
+
+<a name="nested_docker_config"></a>The `docker_config` block supports:
+
+* `immutable_tags` -
+  (Optional)
+  The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.
 
 <a name="nested_maven_config"></a>The `maven_config` block supports:
 
@@ -140,7 +241,90 @@ The following arguments are supported:
   (Optional)
   Version policy defines the versions that the registry will accept.
   Default value is `VERSION_POLICY_UNSPECIFIED`.
-  Possible values are `VERSION_POLICY_UNSPECIFIED`, `RELEASE`, and `SNAPSHOT`.
+  Possible values are: `VERSION_POLICY_UNSPECIFIED`, `RELEASE`, `SNAPSHOT`.
+
+<a name="nested_virtual_repository_config"></a>The `virtual_repository_config` block supports:
+
+* `upstream_policies` -
+  (Optional)
+  Policies that configure the upstream artifacts distributed by the Virtual
+  Repository. Upstream policies cannot be set on a standard repository.
+  Structure is [documented below](#nested_upstream_policies).
+
+
+<a name="nested_upstream_policies"></a>The `upstream_policies` block supports:
+
+* `id` -
+  (Optional)
+  The user-provided ID of the upstream policy.
+
+* `repository` -
+  (Optional)
+  A reference to the repository resource, for example:
+  "projects/p1/locations/us-central1/repository/repo1".
+
+* `priority` -
+  (Optional)
+  Entries with a greater priority value take precedence in the pull order.
+
+<a name="nested_remote_repository_config"></a>The `remote_repository_config` block supports:
+
+* `description` -
+  (Optional)
+  The description of the remote source.
+
+* `docker_repository` -
+  (Optional)
+  Specific settings for a Docker remote repository.
+  Structure is [documented below](#nested_docker_repository).
+
+* `maven_repository` -
+  (Optional)
+  Specific settings for a Maven remote repository.
+  Structure is [documented below](#nested_maven_repository).
+
+* `npm_repository` -
+  (Optional)
+  Specific settings for an Npm remote repository.
+  Structure is [documented below](#nested_npm_repository).
+
+* `python_repository` -
+  (Optional)
+  Specific settings for a Python remote repository.
+  Structure is [documented below](#nested_python_repository).
+
+
+<a name="nested_docker_repository"></a>The `docker_repository` block supports:
+
+* `public_repository` -
+  (Optional)
+  Address of the remote repository.
+  Default value is `DOCKER_HUB`.
+  Possible values are: `DOCKER_HUB`.
+
+<a name="nested_maven_repository"></a>The `maven_repository` block supports:
+
+* `public_repository` -
+  (Optional)
+  Address of the remote repository.
+  Default value is `MAVEN_CENTRAL`.
+  Possible values are: `MAVEN_CENTRAL`.
+
+<a name="nested_npm_repository"></a>The `npm_repository` block supports:
+
+* `public_repository` -
+  (Optional)
+  Address of the remote repository.
+  Default value is `NPMJS`.
+  Possible values are: `NPMJS`.
+
+<a name="nested_python_repository"></a>The `python_repository` block supports:
+
+* `public_repository` -
+  (Optional)
+  Address of the remote repository.
+  Default value is `PYPI`.
+  Possible values are: `PYPI`.
 
 ## Attributes Reference
 
@@ -150,7 +334,7 @@ In addition to the arguments listed above, the following computed attributes are
 
 * `name` -
   The name of the repository, for example:
-  "projects/p1/locations/us-central1/repositories/repo1"
+  "repo1"
 
 * `create_time` -
   The time when the repository was created.
@@ -162,7 +346,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

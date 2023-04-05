@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "BigQuery"
-page_title: "Google: google_bigquery_routine"
 description: |-
   A user-defined function or a stored procedure that belongs to a Dataset
 ---
@@ -138,12 +137,12 @@ The following arguments are supported:
 * `routine_type` -
   (Optional)
   The type of routine.
-  Possible values are `SCALAR_FUNCTION`, `PROCEDURE`, and `TABLE_VALUED_FUNCTION`.
+  Possible values are: `SCALAR_FUNCTION`, `PROCEDURE`, `TABLE_VALUED_FUNCTION`.
 
 * `language` -
   (Optional)
   The language of the routine.
-  Possible values are `SQL` and `JAVASCRIPT`.
+  Possible values are: `SQL`, `JAVASCRIPT`.
 
 * `arguments` -
   (Optional)
@@ -181,7 +180,7 @@ The following arguments are supported:
 * `determinism_level` -
   (Optional)
   The determinism level of the JavaScript UDF if defined.
-  Possible values are `DETERMINISM_LEVEL_UNSPECIFIED`, `DETERMINISTIC`, and `NOT_DETERMINISTIC`.
+  Possible values are: `DETERMINISM_LEVEL_UNSPECIFIED`, `DETERMINISTIC`, `NOT_DETERMINISTIC`.
 
 * `project` - (Optional) The ID of the project in which the resource belongs.
     If it is not provided, the provider project is used.
@@ -197,12 +196,12 @@ The following arguments are supported:
   (Optional)
   Defaults to FIXED_TYPE.
   Default value is `FIXED_TYPE`.
-  Possible values are `FIXED_TYPE` and `ANY_TYPE`.
+  Possible values are: `FIXED_TYPE`, `ANY_TYPE`.
 
 * `mode` -
   (Optional)
   Specifies whether the argument is input or output. Can be set for procedures only.
-  Possible values are `IN`, `OUT`, and `INOUT`.
+  Possible values are: `IN`, `OUT`, `INOUT`.
 
 * `data_type` -
   (Optional)
@@ -232,7 +231,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

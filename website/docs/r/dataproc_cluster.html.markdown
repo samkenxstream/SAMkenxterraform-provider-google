@@ -1,6 +1,5 @@
 ---
 subcategory: "Dataproc"
-page_title: "Google: google_dataproc_cluster"
 description: |-
   Manages a Cloud Dataproc cluster resource.
 ---
@@ -658,19 +657,7 @@ cluster_config {
    a cluster. For a list of valid properties please see
   [Cluster properties](https://cloud.google.com/dataproc/docs/concepts/cluster-properties)
 
-* `optional_components` - (Optional) The set of optional components to activate on the cluster.
-    Accepted values are:
-    * ANACONDA
-    * DRUID
-    * FLINK
-    * HBASE
-    * HIVE_WEBHCAT
-    * JUPYTER
-    * PRESTO
-    * RANGER
-    * SOLR
-    * ZEPPELIN
-    * ZOOKEEPER
+* `optional_components` - (Optional) The set of optional components to activate on the cluster. See [Available Optional Components](https://cloud.google.com/dataproc/docs/concepts/components/overview#available_optional_components).
 
 - - -
 
@@ -899,7 +886,7 @@ This resource does not support import.
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options: configuration options:
 
 - `create` - Default is 45 minutes.
 - `update` - Default is 45 minutes.

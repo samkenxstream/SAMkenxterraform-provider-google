@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Dataproc metastore"
-page_title: "Google: google_dataproc_metastore_federation"
 description: |-
   A managed metastore federation.
 ---
@@ -26,11 +25,6 @@ A managed metastore federation.
 See [Provider Versions](https://terraform.io/docs/providers/google/guides/provider_versions.html) for more details on beta resources.
 
 
-<div class = "oics-button" style="float: right; margin: 0 0 -15px">
-  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=dataproc_metastore_federation_basic&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
-    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
-  </a>
-</div>
 ## Example Usage - Dataproc Metastore Federation Basic
 
 
@@ -38,7 +32,7 @@ See [Provider Versions](https://terraform.io/docs/providers/google/guides/provid
 resource "google_dataproc_metastore_federation" "default" {
   provider      = google-beta
   location      = "us-central1"
-  federation_id = "fed-1"
+  federation_id = ""
   version       = "3.1.2"
 
   backend_metastores {
@@ -50,7 +44,7 @@ resource "google_dataproc_metastore_federation" "default" {
 
 resource "google_dataproc_metastore_service" "default" {
   provider   = google-beta
-  service_id = "fed-1"
+  service_id = ""
   location   = "us-central1"
   tier       = "DEVELOPER"
 
@@ -61,11 +55,6 @@ resource "google_dataproc_metastore_service" "default" {
   }
 }
 ```
-<div class = "oics-button" style="float: right; margin: 0 0 -15px">
-  <a href="https://console.cloud.google.com/cloudshell/open?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fterraform-google-modules%2Fdocs-examples.git&cloudshell_working_dir=dataproc_metastore_federation_bigquery&cloudshell_image=gcr.io%2Fgraphite-cloud-shell-images%2Fterraform%3Alatest&open_in_editor=main.tf&cloudshell_print=.%2Fmotd&cloudshell_tutorial=.%2Ftutorial.md" target="_blank">
-    <img alt="Open in Cloud Shell" src="//gstatic.com/cloudssh/images/open-btn.svg" style="max-height: 44px; margin: 32px auto; max-width: 100%;">
-  </a>
-</div>
 ## Example Usage - Dataproc Metastore Federation Bigquery
 
 
@@ -73,7 +62,7 @@ resource "google_dataproc_metastore_service" "default" {
 resource "google_dataproc_metastore_federation" "default" {
   provider      = google-beta
   location      = "us-central1"
-  federation_id = "fed-2"
+  federation_id = ""
   version       = "3.1.2"
 
   backend_metastores {
@@ -91,7 +80,7 @@ resource "google_dataproc_metastore_federation" "default" {
 
 resource "google_dataproc_metastore_service" "default" {
   provider   = google-beta
-  service_id = "fed-2"
+  service_id = ""
   location   = "us-central1"
   tier       = "DEVELOPER"
 
@@ -139,7 +128,7 @@ The following arguments are supported:
 * `metastore_type` -
   (Required)
   The type of the backend metastore.
-  Possible values are `METASTORE_TYPE_UNSPECIFIED`, `DATAPROC_METASTORE`, and `BIGQUERY`.
+  Possible values are: `METASTORE_TYPE_UNSPECIFIED`, `DATAPROC_METASTORE`, `BIGQUERY`.
 
 - - -
 
@@ -181,7 +170,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

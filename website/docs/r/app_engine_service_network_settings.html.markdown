@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "App Engine"
-page_title: "Google: google_app_engine_service_network_settings"
 description: |-
   A NetworkSettings resource is a container for ingress settings for a version or service.
 ---
@@ -47,9 +46,9 @@ resource "google_storage_bucket_object" "object" {
 	source = "./test-fixtures/appengine/hello-world.zip"
 }
 
-resource "google_app_engine_standard_app_version" "liveapp_v1" {
+resource "google_app_engine_standard_app_version" "internalapp" {
   version_id = "v1"
-  service = "liveapp"
+  service = "internalapp"
   delete_service_on_destroy = true
 
   runtime = "nodejs10"
@@ -66,8 +65,8 @@ resource "google_app_engine_standard_app_version" "liveapp_v1" {
   }
 }
 
-resource "google_app_engine_service_network_settings" "liveapp" {
-  service = google_app_engine_standard_app_version.liveapp_v1.service
+resource "google_app_engine_service_network_settings" "internalapp" {
+  service = google_app_engine_standard_app_version.internalapp.service
   network_settings {
     ingress_traffic_allowed = "INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY"
   }
@@ -95,7 +94,7 @@ The following arguments are supported:
   (Optional)
   The ingress settings for version or service.
   Default value is `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`.
-  Possible values are `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`, `INGRESS_TRAFFIC_ALLOWED_ALL`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY`, and `INGRESS_TRAFFIC_ALLOWED_INTERNAL_AND_LB`.
+  Possible values are: `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`, `INGRESS_TRAFFIC_ALLOWED_ALL`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_AND_LB`.
 
 - - -
 
@@ -114,7 +113,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.

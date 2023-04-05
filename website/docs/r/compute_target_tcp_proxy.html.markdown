@@ -13,7 +13,6 @@
 #
 # ----------------------------------------------------------------------------
 subcategory: "Compute Engine"
-page_title: "Google: google_compute_target_tcp_proxy"
 description: |-
   Represents a TargetTcpProxy resource, which is used by one or more
   global forwarding rule to route incoming TCP requests to a Backend
@@ -98,7 +97,7 @@ The following arguments are supported:
   Specifies the type of proxy header to append before sending data to
   the backend.
   Default value is `NONE`.
-  Possible values are `NONE` and `PROXY_V1`.
+  Possible values are: `NONE`, `PROXY_V1`.
 
 * `proxy_bind` -
   (Optional)
@@ -126,7 +125,7 @@ In addition to the arguments listed above, the following computed attributes are
 ## Timeouts
 
 This resource provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+[Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options:
 
 - `create` - Default is 20 minutes.
 - `update` - Default is 20 minutes.
