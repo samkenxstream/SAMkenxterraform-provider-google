@@ -13,8 +13,6 @@ import (
 	googleoauth "golang.org/x/oauth2/google"
 )
 
-const TestEnvVar = "TF_ACC"
-
 // Global MutexKV
 var mutexKV = NewMutexKV()
 
@@ -579,6 +577,8 @@ func Provider() *schema.Provider {
 			"google_access_approval_organization_service_account": DataSourceAccessApprovalOrganizationServiceAccount(),
 			"google_access_approval_project_service_account":      DataSourceAccessApprovalProjectServiceAccount(),
 			"google_active_folder":                                DataSourceGoogleActiveFolder(),
+			"google_alloydb_locations":                            DataSourceAlloydbLocations(),
+			"google_alloydb_supported_database_flags":             DataSourceAlloydbSupportedDatabaseFlags(),
 			"google_artifact_registry_repository":                 DataSourceArtifactRegistryRepository(),
 			"google_app_engine_default_service_account":           DataSourceGoogleAppEngineDefaultServiceAccount(),
 			"google_beyondcorp_app_connection":                    DataSourceGoogleBeyondcorpAppConnection(),
@@ -712,9 +712,9 @@ func Provider() *schema.Provider {
 	return provider
 }
 
-// Generated resources: 276
+// Generated resources: 281
 // Generated IAM resources: 186
-// Total generated resources: 462
+// Total generated resources: 467
 func ResourceMap() map[string]*schema.Resource {
 	resourceMap, _ := ResourceMapWithErrors()
 	return resourceMap
@@ -735,6 +735,7 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_access_context_manager_access_policy_iam_policy":       ResourceIamPolicy(AccessContextManagerAccessPolicyIamSchema, AccessContextManagerAccessPolicyIamUpdaterProducer, AccessContextManagerAccessPolicyIdParseFunc),
 			"google_access_context_manager_authorized_orgs_desc":           ResourceAccessContextManagerAuthorizedOrgsDesc(),
 			"google_access_context_manager_gcp_user_access_binding":        ResourceAccessContextManagerGcpUserAccessBinding(),
+			"google_access_context_manager_ingress_policy":                 ResourceAccessContextManagerIngressPolicy(),
 			"google_access_context_manager_service_perimeter":              ResourceAccessContextManagerServicePerimeter(),
 			"google_access_context_manager_service_perimeter_resource":     ResourceAccessContextManagerServicePerimeterResource(),
 			"google_access_context_manager_service_perimeters":             ResourceAccessContextManagerServicePerimeters(),
@@ -746,7 +747,6 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_apigee_addons_config":                                  ResourceApigeeAddonsConfig(),
 			"google_apigee_endpoint_attachment":                            ResourceApigeeEndpointAttachment(),
 			"google_apigee_env_keystore":                                   ResourceApigeeEnvKeystore(),
-			"google_apigee_env_keystore_alias_self_signed_cert":            ResourceApigeeEnvKeystoreAliasSelfSignedCert(),
 			"google_apigee_env_references":                                 ResourceApigeeEnvReferences(),
 			"google_apigee_envgroup":                                       ResourceApigeeEnvgroup(),
 			"google_apigee_envgroup_attachment":                            ResourceApigeeEnvgroupAttachment(),
@@ -756,6 +756,7 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_apigee_environment_iam_policy":                         ResourceIamPolicy(ApigeeEnvironmentIamSchema, ApigeeEnvironmentIamUpdaterProducer, ApigeeEnvironmentIdParseFunc),
 			"google_apigee_instance":                                       ResourceApigeeInstance(),
 			"google_apigee_instance_attachment":                            ResourceApigeeInstanceAttachment(),
+			"google_apigee_keystores_aliases_self_signed_cert":             ResourceApigeeKeystoresAliasesSelfSignedCert(),
 			"google_apigee_nat_address":                                    ResourceApigeeNatAddress(),
 			"google_apigee_organization":                                   ResourceApigeeOrganization(),
 			"google_apigee_sync_authorization":                             ResourceApigeeSyncAuthorization(),
@@ -888,8 +889,11 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_compute_node_template":                                 ResourceComputeNodeTemplate(),
 			"google_compute_packet_mirroring":                              ResourceComputePacketMirroring(),
 			"google_compute_per_instance_config":                           ResourceComputePerInstanceConfig(),
+			"google_compute_public_advertised_prefix":                      ResourceComputePublicAdvertisedPrefix(),
+			"google_compute_public_delegated_prefix":                       ResourceComputePublicDelegatedPrefix(),
 			"google_compute_region_autoscaler":                             ResourceComputeRegionAutoscaler(),
 			"google_compute_region_backend_service":                        ResourceComputeRegionBackendService(),
+			"google_compute_region_commitment":                             ResourceComputeRegionCommitment(),
 			"google_compute_region_disk":                                   ResourceComputeRegionDisk(),
 			"google_compute_region_disk_iam_binding":                       ResourceIamBinding(ComputeRegionDiskIamSchema, ComputeRegionDiskIamUpdaterProducer, ComputeRegionDiskIdParseFunc),
 			"google_compute_region_disk_iam_member":                        ResourceIamMember(ComputeRegionDiskIamSchema, ComputeRegionDiskIamUpdaterProducer, ComputeRegionDiskIdParseFunc),
@@ -1070,6 +1074,7 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_kms_key_ring":                                          ResourceKMSKeyRing(),
 			"google_kms_key_ring_import_job":                               ResourceKMSKeyRingImportJob(),
 			"google_kms_secret_ciphertext":                                 ResourceKMSSecretCiphertext(),
+			"google_logging_linked_dataset":                                ResourceLoggingLinkedDataset(),
 			"google_logging_log_view":                                      ResourceLoggingLogView(),
 			"google_logging_metric":                                        ResourceLoggingMetric(),
 			"google_memcache_instance":                                     ResourceMemcacheInstance(),
@@ -1177,7 +1182,7 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 			"google_apigee_sharedflow":                      ResourceApigeeSharedFlow(),
 			"google_apigee_sharedflow_deployment":           ResourceApigeeSharedFlowDeployment(),
 			"google_apigee_flowhook":                        ResourceApigeeFlowhook(),
-			"google_apigee_env_keystore_alias_pkcs12":       ResourceApigeeEnvKeystoreAliasPkcs12(),
+			"google_apigee_keystores_aliases_pkcs12":        ResourceApigeeKeystoresAliasesPkcs12(),
 			"google_apigee_keystores_aliases_key_cert_file": ResourceApigeeKeystoresAliasesKeyCertFile(),
 			"google_bigquery_table":                         ResourceBigQueryTable(),
 			"google_bigtable_gc_policy":                     ResourceBigtableGCPolicy(),
@@ -1321,7 +1326,10 @@ func ResourceMapWithErrors() (map[string]*schema.Resource, error) {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData, p *schema.Provider) (interface{}, diag.Diagnostics) {
-	HandleSDKDefaults(d)
+	err := HandleSDKDefaults(d)
+	if err != nil {
+		return nil, diag.FromErr(err)
+	}
 	HandleDCLCustomEndpointDefaults(d)
 
 	config := Config{
@@ -1534,4 +1542,26 @@ func validateCredentials(v interface{}, k string) (warnings []string, errors []e
 	}
 
 	return
+}
+
+func mergeResourceMaps(ms ...map[string]*schema.Resource) (map[string]*schema.Resource, error) {
+	merged := make(map[string]*schema.Resource)
+	duplicates := []string{}
+
+	for _, m := range ms {
+		for k, v := range m {
+			if _, ok := merged[k]; ok {
+				duplicates = append(duplicates, k)
+			}
+
+			merged[k] = v
+		}
+	}
+
+	var err error
+	if len(duplicates) > 0 {
+		err = fmt.Errorf("saw duplicates in mergeResourceMaps: %v", duplicates)
+	}
+
+	return merged, err
 }

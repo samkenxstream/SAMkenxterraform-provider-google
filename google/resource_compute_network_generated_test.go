@@ -31,7 +31,7 @@ func TestAccComputeNetwork_networkBasicExample(t *testing.T) {
 	}
 
 	VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckComputeNetworkDestroyProducer(t),
 		Steps: []resource.TestStep{
@@ -64,7 +64,7 @@ func TestAccComputeNetwork_networkCustomMtuExample(t *testing.T) {
 	}
 
 	VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckComputeNetworkDestroyProducer(t),
 		Steps: []resource.TestStep{
@@ -100,7 +100,7 @@ func TestAccComputeNetwork_networkCustomFirewallEnforcementOrderExample(t *testi
 	}
 
 	VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckComputeNetworkDestroyProducer(t),
 		Steps: []resource.TestStep{
@@ -119,9 +119,9 @@ func TestAccComputeNetwork_networkCustomFirewallEnforcementOrderExample(t *testi
 func testAccComputeNetwork_networkCustomFirewallEnforcementOrderExample(context map[string]interface{}) string {
 	return Nprintf(`
 resource "google_compute_network" "vpc_network" {
-  project                 = "%{project}"
-  name                    = "tf-test-vpc-network%{random_suffix}"
-  auto_create_subnetworks = true
+  project                                   = "%{project}"
+  name                                      = "tf-test-vpc-network%{random_suffix}"
+  auto_create_subnetworks                   = true
   network_firewall_policy_enforcement_order = "BEFORE_CLASSIC_FIREWALL"
 }
 `, context)

@@ -32,7 +32,7 @@ func TestAccLoggingLogView_loggingLogViewBasicExample(t *testing.T) {
 	}
 
 	VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckLoggingLogViewDestroyProducer(t),
 		Steps: []resource.TestStep{
@@ -59,7 +59,7 @@ resource "google_logging_project_bucket_config" "logging_log_view" {
 }
 
 resource "google_logging_log_view" "logging_log_view" {
-  name        = "tf-test-view%{random_suffix}"
+  name        = "tf-test-my-view%{random_suffix}"
   bucket      = google_logging_project_bucket_config.logging_log_view.id
   description = "A logging view configured with Terraform"
   filter      = "SOURCE(\"projects/myproject\") AND resource.type = \"gce_instance\" AND LOG_ID(\"stdout\")"
@@ -76,7 +76,7 @@ func TestAccLoggingLogView_loggingLogViewLongNameExample(t *testing.T) {
 	}
 
 	VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckLoggingLogViewDestroyProducer(t),
 		Steps: []resource.TestStep{

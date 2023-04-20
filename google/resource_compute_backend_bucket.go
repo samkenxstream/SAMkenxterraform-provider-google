@@ -303,7 +303,12 @@ func resourceComputeBackendBucketCreate(d *schema.ResourceData, meta interface{}
 		obj["name"] = nameProp
 	}
 
-	url, err := replaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets")
+	obj, err = resourceComputeBackendBucketEncoder(d, meta, obj)
+	if err != nil {
+		return err
+	}
+
+	url, err := ReplaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets")
 	if err != nil {
 		return err
 	}
@@ -328,7 +333,7 @@ func resourceComputeBackendBucketCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	// Store the ID now
-	id, err := replaceVars(d, config, "projects/{{project}}/global/backendBuckets/{{name}}")
+	id, err := ReplaceVars(d, config, "projects/{{project}}/global/backendBuckets/{{name}}")
 	if err != nil {
 		return fmt.Errorf("Error constructing id: %s", err)
 	}
@@ -376,7 +381,7 @@ func resourceComputeBackendBucketRead(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	url, err := replaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
+	url, err := ReplaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
 	if err != nil {
 		return err
 	}
@@ -502,7 +507,12 @@ func resourceComputeBackendBucketUpdate(d *schema.ResourceData, meta interface{}
 		obj["name"] = nameProp
 	}
 
-	url, err := replaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
+	obj, err = resourceComputeBackendBucketEncoder(d, meta, obj)
+	if err != nil {
+		return err
+	}
+
+	url, err := ReplaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
 	if err != nil {
 		return err
 	}
@@ -567,7 +577,7 @@ func resourceComputeBackendBucketDelete(d *schema.ResourceData, meta interface{}
 	}
 	billingProject = project
 
-	url, err := replaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
+	url, err := ReplaceVars(d, config, "{{ComputeBasePath}}projects/{{project}}/global/backendBuckets/{{name}}")
 	if err != nil {
 		return err
 	}
@@ -599,7 +609,7 @@ func resourceComputeBackendBucketDelete(d *schema.ResourceData, meta interface{}
 
 func resourceComputeBackendBucketImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	config := meta.(*Config)
-	if err := parseImportId([]string{
+	if err := ParseImportId([]string{
 		"projects/(?P<project>[^/]+)/global/backendBuckets/(?P<name>[^/]+)",
 		"(?P<project>[^/]+)/(?P<name>[^/]+)",
 		"(?P<name>[^/]+)",
@@ -608,7 +618,7 @@ func resourceComputeBackendBucketImport(d *schema.ResourceData, meta interface{}
 	}
 
 	// Replace import id for the resource id
-	id, err := replaceVars(d, config, "projects/{{project}}/global/backendBuckets/{{name}}")
+	id, err := ReplaceVars(d, config, "projects/{{project}}/global/backendBuckets/{{name}}")
 	if err != nil {
 		return nil, fmt.Errorf("Error constructing id: %s", err)
 	}
@@ -1121,4 +1131,47 @@ func expandComputeBackendBucketEnableCdn(v interface{}, d TerraformResourceData,
 
 func expandComputeBackendBucketName(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
+}
+
+func resourceComputeBackendBucketEncoder(d *schema.ResourceData, meta interface{}, obj map[string]interface{}) (map[string]interface{}, error) {
+	// This custom encoder helps prevent sending 0 for clientTtl, defaultTtl and
+	// maxTtl in API calls to update these values  when unset in the provider
+	// (doing so results in an API level error)
+	c, cdnPolicyOk := d.GetOk("cdn_policy")
+
+	// Only apply during updates
+	if !cdnPolicyOk || obj["cdnPolicy"] == nil {
+		return obj, nil
+	}
+
+	currentCdnPolicies := c.([]interface{})
+
+	// state does not contain cdnPolicy, so we can return early here as well
+	if len(currentCdnPolicies) == 0 {
+		return obj, nil
+	}
+
+	futureCdnPolicy := obj["cdnPolicy"].(map[string]interface{})
+	currentCdnPolicy := currentCdnPolicies[0].(map[string]interface{})
+
+	cacheMode, ok := futureCdnPolicy["cache_mode"].(string)
+	// Fallback to state if doesn't exist in object
+	if !ok {
+		cacheMode = currentCdnPolicy["cache_mode"].(string)
+	}
+
+	switch cacheMode {
+	case "USE_ORIGIN_HEADERS":
+		if _, ok := futureCdnPolicy["clientTtl"]; ok {
+			delete(futureCdnPolicy, "clientTtl")
+		}
+		if _, ok := futureCdnPolicy["defaultTtl"]; ok {
+			delete(futureCdnPolicy, "defaultTtl")
+		}
+		if _, ok := futureCdnPolicy["maxTtl"]; ok {
+			delete(futureCdnPolicy, "maxTtl")
+		}
+	}
+
+	return obj, nil
 }
